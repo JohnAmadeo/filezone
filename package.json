@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "react": "^0.14.7",
-    "react-dom": "^0.14.7"
+    "react-dom": "^0.14.7",
+    "react-dropzone": "^3.7.3",
+    "superagent": "^3.1.0"
   }
 }
