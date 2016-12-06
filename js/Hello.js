@@ -1,13 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom'
 import Dropzone from 'react-dropzone';
-
-var request = require('superagent');
+import Request from 'superagent';
+import PDF from 'react-pdf-js';
 
 var Hello = React.createClass({
   onDrop: function(acceptedFiles, rejectedFiles) {
-    var req = request.post('/upload');
-    console.log(request);
+    var req = Request.post('/upload');
+    console.log(req);
     acceptedFiles.forEach((file)=> {
         req.attach(file.name, file);
     });
@@ -17,8 +17,14 @@ var Hello = React.createClass({
       }
     });
   },
-
+  onDocumentComplete(pages) {
+    this.setState({page: 1, pages})
+  },
+  onPageComplete(page) {
+    this.setState({page})
+  },
   render() {
+  {/*
     return (
       <div>
         <h1>Hello, world. Upwards and Onwards! It's me!</h1>
@@ -26,6 +32,15 @@ var Hello = React.createClass({
         <Dropzone onDrop={this.onDrop}>
           <div>Try dropping some files here, or click to select files to upload.</div>
         </Dropzone>
+      </div>
+    )
+  }*/}
+    return (
+      <div>
+        <PDF  file="/hw1.pdf"               
+              onDocumentComplete={this.onDocumentComplete} 
+              onPageComplete={this.onPageComplete}
+              page={2} />
       </div>
     )
   }
