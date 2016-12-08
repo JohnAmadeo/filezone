@@ -1,0 +1,19 @@
+body {
+  padding-top: 65px;
+}
+
+/* Header */
+.navbar {
+  border: 1px solid black;
+}
+
+.Header * .navbar-brand {
+  margin-left: 30px;
+}
+
+/* Storage */
+@media (min-width: 768px) {
+  .Storage {
+    max-width: 730px;
+  }
+}

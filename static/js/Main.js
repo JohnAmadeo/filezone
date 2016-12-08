@@ -9,7 +9,7 @@ class Main extends React.Component {
   }
   render() {
     return (
-      <div className='PDFViewer'>
+      <div className='Main'>
         <Header />
         <Storage />
       </div>
@@ -20,7 +20,11 @@ class Main extends React.Component {
 const Header = (props) => {
   return (
     <div className='Header'>
-      <p>FileZone</p>
+      <nav className="navbar navbar-fixed-top">
+          <div className="navbar-header">
+            <a className="navbar-brand" href="#">FileZone</a>
+          </div>
+      </nav>
     </div>
   )
 }
@@ -37,7 +41,7 @@ class Storage extends React.Component {
   }
   render() {
     return (
-      <div className="Storage">
+      <div className="Storage container">
         <UploadBox onUploadFile={this.onUploadFile}/>
         <FileList filenameList={this.state.filenameList}/>
       </div>
@@ -59,12 +63,14 @@ class UploadBox extends React.Component {
     console.log(acceptedFiles, rejectedFiles);
   }
   render() {
-    <div className="UploadBox">
-      <Picker />
-      <Dropzone onDrop={this.onDrop}>
-        <div> Try dropping files here </div>
-      </Dropzone>  
-    </div>
+    return (
+      <div className="UploadBox">
+        <Picker />
+        <Dropzone onDrop={this.onDrop}>
+          <div> Try dropping files here </div>
+        </Dropzone>  
+      </div>
+    )
   }
 }
 
@@ -82,7 +88,7 @@ const Picker = (props) => {
 const FileList = (props) => {
   return (
     <div className="FileList table-responsive">
-      <table class="table">
+      <table className="table">
         <thead>
           <tr>
             <th>Name</th>
@@ -90,8 +96,8 @@ const FileList = (props) => {
           </tr>
         </thead>
         <tbody>
-          {props.filenameList.map((filename) => (
-            <File filename={filename}/>
+          {props.filenameList.map((filename, index) => (
+            <File filename={filename} key={index}/>
           ))}
         </tbody>
       </table>
