@@ -1,9 +1,8 @@
-import Hello from './Hello';
-import PDFViewer from './PDFViewer';
+import Main from './Main';
 import React from 'react';
 import ReactDOM from 'react-dom'
 
-ReactDOM.render(<PDFViewer/>, document.getElementById('app'));
+ReactDOM.render(<Main/>, document.getElementById('app'));
 // ReactDOM.render(
 //   <DropzoneComponent config={componentConfig}
 //                      eventHandlers={eventHandlers}

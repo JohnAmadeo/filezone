@@ -6,7 +6,9 @@ import PDF from 'react-pdf-js';
 
 var Hello = React.createClass({
   getInitialState: function() {
-    return {page: 1}
+    return {
+      page: 1,
+    }
   },
   onDrop: function(acceptedFiles, rejectedFiles) {
     var req = Request.post('/upload');

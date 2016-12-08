@@ -1,8 +1,58 @@
+<html>
 <head>
-  <script src='https://cdn.rawgit.com/mozilla/pdfjs-dist/master/build/pdf.js'></script>
-  <!--<script src="../build/pdf.worker.js"></script>-->
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="static/index.css">
 </head>
+
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <div style="margin-bottom: 100px">
+      <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#">FileZone</a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div class="container">
+      <div class="upload-box">
+        <div class="btn-group" role="group" aria-label="..." style="width: 600px">
+          <button type="button" class="btn btn-default" style="width: 33%">Left</button>
+          <button type="button" class="btn btn-default" style="width: 33%">Middle</button>
+          <button type="button" class="btn btn-default" style="width: 33%">Right</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Filename</th>
+              <th>Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Oct2016Accounts.pdf</td>
+              <td>67KB</td>
+            </tr>
+            <tr>
+              <td>test.pdf</td>
+              <td>5KB</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div> <!-- /container -->
+
+  </div>
+
+
+  <!-- Scripts -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js">
   <script type="text/javascript" src="{{ url_for('static', filename='bundle.js') }}"></script>
 </body>
+</html>
