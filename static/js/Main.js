@@ -30,7 +30,7 @@ class Storage extends React.Component {
     super(props);
     this.onUploadFile = this.onUploadFile.bind(this);
     this.state = {
-      filenameList = ['file1', 'file2']
+      filenameList: ['file1', 'file2']
     }
   }
   onUploadFile() {
@@ -51,6 +51,7 @@ Storage.propTypes = {
 
 class UploadBox extends React.Component {
   constructor(props) {
+    super(props);
     this.onDrop = this.onDrop.bind(this);
     super(props);
   }
