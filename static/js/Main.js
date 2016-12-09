@@ -94,7 +94,8 @@ const FileList = (props) => {
         <thead>
           <tr>
             <th>Name</th>
-            <th>Size</th>
+            <th className="rest-child">Size</th>
+            <th className="rest-child">Uploaded</th>
           </tr>
         </thead>
         <tbody>
@@ -121,7 +122,8 @@ class File extends React.Component {
         <th>
           <a href={"https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=" + this.props.filename}>{this.props.filename}</a>
         </th>
-        <th>0.5KB</th>
+        <th className="rest-child">0.5KB</th>
+        <th className="rest-child">9/9/2016 3:45</th>
       </tr>
     )
   }
