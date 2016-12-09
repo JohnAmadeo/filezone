@@ -33,30 +33,27 @@ class Storage extends React.Component {
   constructor(props) {
     super(props);
     this.onDrop = this.onDrop.bind(this);
-    this.getFormat = this.getFormat.bind(this);
     this.state = {
       filenameList: ['test.pdf']
     }
   }
   onDrop(acceptedFiles, rejectedFiles) {    
     var acceptedFilenameList = acceptedFiles.map((file) => file.name);
-    var rejectedFilenameList = rejectedFiles.map((file) => file.name);
-
-    var PDFNameList = acceptedFilenameList.filter(
-      (filename) => this.getFormat(filename) === 'pdf');
-
-    {/*var req = Request.post('/upload')
-              .send()
-              .end((err, res) => {
-                
-              });*/}
-
-    this.setState({
-      filenameList: [...this.state.filenameList, ...PDFNameList]
+    
+    {/* Send PDF to Flask back-end via POST request */}
+    var req = Request.post('/upload');
+    acceptedFiles.map((file) => {
+      req.attach(file.name, file);
     });
-  }
-  getFormat(filename) {
-    return filename.slice(filename.length - 3, filename.length);
+    req.end((err, res) => {
+      if(res.statusCode != 200) {
+        console.log(res.statusText);
+      }
+    })  
+    
+    this.setState({
+      filenameList: [...this.state.filenameList, ...acceptedFilenameList]
+    });
   }
   render() {
     return (
