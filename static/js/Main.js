@@ -66,8 +66,10 @@ class UploadBox extends React.Component {
     return (
       <div className="UploadBox">
         <Picker />
-        <Dropzone onDrop={this.onDrop}>
-          <div> Try dropping files here </div>
+        <Dropzone className="Dropzone" onDrop={this.onDrop}>
+          <div> 
+            <span> Drag and drop files or click on the box to start uploading </span>
+          </div>
         </Dropzone>  
       </div>
     )
