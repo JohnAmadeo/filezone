@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom'
 import Dropzone from 'react-dropzone';
 import Request from 'superagent';
+import UUID from 'uuid/v4';
 
 class Main extends React.Component {
   constructor(props) {
@@ -34,20 +35,25 @@ class Storage extends React.Component {
     super(props);
     this.onDrop = this.onDrop.bind(this);
     this.state = {
-      filenameList: ['test.pdf']
+      filenameList: ['test.pdf'],
+      userID: UUID()
     }
   }
-  onDrop(acceptedFiles, rejectedFiles) {    
+  onDrop(acceptedFiles, rejectedFiles) {   
     var acceptedFilenameList = acceptedFiles.map((file) => file.name);
     
     {/* Send PDF to Flask back-end via POST request */}
     var req = Request.post('/upload');
+    req.set('userID', this.state.userID);
     acceptedFiles.map((file) => {
       req.attach(file.name, file);
     });
     req.end((err, res) => {
       if(res.statusCode != 200) {
         console.log(res.statusText);
+      }
+      else {
+        console.log(res);
       }
     })  
     
@@ -66,7 +72,8 @@ class Storage extends React.Component {
 }
 
 Storage.propTypes = {
-  filenameList: React.PropTypes.arrayOf(React.PropTypes.string)
+  filenameList: React.PropTypes.arrayOf(React.PropTypes.string),
+  userID: React.PropTypes.string
 }
 
 {/*class FailedUploadAlert extends React.Component {
