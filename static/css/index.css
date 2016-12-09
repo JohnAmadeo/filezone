@@ -54,14 +54,26 @@ body {
   border: 0px;
 }
 
+#app .FileList table {
+  table-layout: fixed;
+}
+
 #app .FileList th {
   font-size: 14px;
   font-weight: normal;
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis;
 }
 
-#app .FileList .rest-child {
+#app .FileList .upload-time {
   text-align: right;
-  width: 150px;
+  width: 110px;
+}
+
+#app .FileList .size {
+  text-align: right;
+  width: 70px;
 }
 
 #app .FileList th:nth-child(1) {

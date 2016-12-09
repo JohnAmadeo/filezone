@@ -69,8 +69,7 @@ class Storage extends React.Component {
 }
 
 Storage.propTypes = {
-  filenameList: React.PropTypes.arrayOf(React.PropTypes.string),
-  errorFilenameList: React.PropTypes.arrayOf(React.PropTypes.string)
+  filenameList: React.PropTypes.arrayOf(React.PropTypes.string)
 }
 
 {/*class FailedUploadAlert extends React.Component {
@@ -101,7 +100,7 @@ const UploadBox = (props) => {
       <Picker />
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
-          <span> Drag and drop PDFs or click on the box to start uploading </span>
+          <span> Drag and drop PDFs or click the box to start uploading </span>
         </div>
       </Dropzone>  
     </div>
@@ -126,8 +125,8 @@ const FileList = (props) => {
         <thead>
           <tr>
             <th>Name</th>
-            <th className="rest-child">Size</th>
-            <th className="rest-child">Uploaded</th>
+            <th className="size">Size</th>
+            <th className="upload-time">Uploaded</th>
           </tr>
         </thead>
         <tbody>
@@ -152,10 +151,12 @@ class File extends React.Component {
     return (
       <tr>
         <th>
-          <a href={"https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=" + this.props.filename}>{this.props.filename}</a>
+          <a href={"https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=" + this.props.filename}>
+            {this.props.filename}
+          </a>
         </th>
-        <th className="rest-child">0.5KB</th>
-        <th className="rest-child">9/9/2016 3:45</th>
+        <th className="size">0.5KB</th>
+        <th className="upload-time">9/9/2016 3:45</th>
       </tr>
     )
   }
