@@ -32,48 +32,80 @@ const Header = (props) => {
 class Storage extends React.Component {
   constructor(props) {
     super(props);
-    this.onUploadFile = this.onUploadFile.bind(this);
+    this.onDrop = this.onDrop.bind(this);
+    this.getFormat = this.getFormat.bind(this);
     this.state = {
-      filenameList: ['file1', 'file2']
+      filenameList: ['test.pdf']
     }
   }
-  onUploadFile() {
+  onDrop(acceptedFiles, rejectedFiles) {    
+    var acceptedFilenameList = acceptedFiles.map((file) => file.name);
+    var rejectedFilenameList = rejectedFiles.map((file) => file.name);
+
+    var PDFNameList = acceptedFilenameList.filter(
+      (filename) => this.getFormat(filename) === 'pdf');
+
+    {/*var req = Request.post('/upload')
+              .send()
+              .end((err, res) => {
+                
+              });*/}
+
+    this.setState({
+      filenameList: [...this.state.filenameList, ...PDFNameList]
+    });
+  }
+  getFormat(filename) {
+    return filename.slice(filename.length - 3, filename.length);
   }
   render() {
     return (
       <div className="Storage container">
-        <UploadBox onUploadFile={this.onUploadFile}/>
-        <FileList filenameList={this.state.filenameList}/>
+        <UploadBox onDrop={this.onDrop} />
+        <FileList filenameList={this.state.filenameList} />
       </div>
     )
   }
 }
 
 Storage.propTypes = {
-  filenameList: React.PropTypes.arrayOf(React.PropTypes.string)
+  filenameList: React.PropTypes.arrayOf(React.PropTypes.string),
+  errorFilenameList: React.PropTypes.arrayOf(React.PropTypes.string)
 }
 
-class UploadBox extends React.Component {
+{/*class FailedUploadAlert extends React.Component {
   constructor(props) {
     super(props);
-    this.onDrop = this.onDrop.bind(this);
-    super(props);
-  }
-  onDrop(acceptedFiles, rejectedFiles) {
-    console.log(acceptedFiles, rejectedFiles);
   }
   render() {
-    return (
-      <div className="UploadBox">
-        <Picker />
-        <Dropzone className="Dropzone" onDrop={this.onDrop}>
-          <div> 
-            <span> Drag and drop files or click on the box to start uploading </span>
-          </div>
-        </Dropzone>  
-      </div>
-    )
+    var errorFilenameList = this.props.errorFilenameList;
+    if(errorFilenameList && errorFilenameList.length > 0) {
+      return (
+        <div className="alert alert-danger alert-dismissible" role="alert">
+          <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          Sorry! {this.props.errorFilenameList.join(', ')} could not be uploaded. Please check .
+        </div>
+      )    
+    }
+    else {
+      return null;
+    }
   }
+}*/}
+
+const UploadBox = (props) => {
+  return (
+    <div className="UploadBox">
+      <Picker />
+      <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
+        <div> 
+          <span> Drag and drop PDFs or click on the box to start uploading </span>
+        </div>
+      </Dropzone>  
+    </div>
+  )
 }
 
 {/*Insert onSelect functions*/}
