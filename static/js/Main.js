@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import Dropzone from 'react-dropzone';
 import Request from 'superagent';
 import UUID from 'uuid/v4';
+import Moment from 'moment';
 
 class Main extends React.Component {
   constructor(props) {
@@ -35,14 +36,13 @@ class Storage extends React.Component {
     super(props);
     this.onDrop = this.onDrop.bind(this);
     this.state = {
-      filenameList: [],
-      rejectedFilenameList: [],
+      acceptedFiles: [],
+      rejectedFiles: [],
       userID: UUID()
     }
   }
   onDrop(acceptedFiles, rejectedFiles) {   
-    var acceptedFilenameList = acceptedFiles.map((file) => file.name);
-    var rejectedFilenameList = rejectedFiles.map((file) => file.name);
+    console.log(acceptedFiles);
 
     {/* Send PDF to Flask back-end via POST request */}
     var req = Request.post('/upload');
@@ -60,16 +60,16 @@ class Storage extends React.Component {
     })  
     
     this.setState({
-      filenameList: [...this.state.filenameList, ...acceptedFilenameList],
-      rejectedFilenameList: rejectedFilenameList
+      acceptedFiles: [...this.state.acceptedFiles, ...acceptedFiles],
+      rejectedFiles: rejectedFiles
     });
   }
   render() {
     return (
       <div className="Storage container">
-        <FailedUploadAlert rejectedFilenameList={this.state.rejectedFilenameList}/>
+        <FailedUploadAlert rejectedFiles={this.state.rejectedFiles}/>
         <UploadBox onDrop={this.onDrop} />
-        <FileList filenameList={this.state.filenameList} 
+        <FileList acceptedFiles={this.state.acceptedFiles} 
                   userID={this.state.userID}/>
       </div>
     )
@@ -77,8 +77,8 @@ class Storage extends React.Component {
 }
 
 Storage.propTypes = {
-  filenameList: React.PropTypes.arrayOf(React.PropTypes.string),
-  rejectedFilenameList: React.PropTypes.arrayOf(React.PropTypes.string),
+  acceptedFiles: React.PropTypes.arrayOf(React.PropTypes.object),
+  rejectedFiles: React.PropTypes.arrayOf(React.PropTypes.object),
   userID: React.PropTypes.string
 }
 
@@ -87,14 +87,15 @@ class FailedUploadAlert extends React.Component {
     super(props);
   }
   render() {
-    var rejectedFilenameList = this.props.rejectedFilenameList;
-    if(rejectedFilenameList && rejectedFilenameList.length > 0) {
+    var rejectedFiles = this.props.rejectedFiles;
+    var rejectedFilenames = rejectedFiles.map((file) => file.name);
+    if(rejectedFiles && rejectedFiles.length > 0) {
       return (
         <div className="alert alert-danger alert-dismissible" role="alert">
           <button type="button" className="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          Sorry! <strong> {rejectedFilenameList.join(', ')} </strong> 
+          Sorry! <strong> {rejectedFilenames.join(', ')} </strong> 
           could not be uploaded because they are not PDFs.
         </div>
       )    
@@ -108,10 +109,10 @@ class FailedUploadAlert extends React.Component {
 const UploadBox = (props) => {
   return (
     <div className="UploadBox">
-      <Picker />
+      {/*<Picker />*/}
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
-          <span> Drag and drop PDFs or click the box to start uploading </span>
+          <span> Drag and drop PDFs or click the box to upload </span>
         </div>
       </Dropzone>  
     </div>
@@ -137,12 +138,11 @@ const FileList = (props) => {
           <tr>
             <th>Name</th>
             <th className="size">Size</th>
-            <th className="upload-time">Uploaded</th>
           </tr>
         </thead>
         <tbody>
-          {props.filenameList.map((filename, index) => (
-            <File filename={filename} userID={props.userID} key={index}/>
+          {props.acceptedFiles.map((file, index) => (
+            <File file={file} userID={props.userID} key={index}/>
           ))}
         </tbody>
       </table>
@@ -153,24 +153,19 @@ const FileList = (props) => {
 class File extends React.Component {
   constructor(props) {
     super(props);
-    this.onViewFile = this.onViewFile.bind(this);
-  }
-  onViewFile() {
-    console.log(this.props.filename);
   }
   render() {
     var viewerUrl = "https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=";
-    var userPath = "../pdf/" + this.props.userID + "/" + this.props.filename;
+    var userPath = "../pdf/" + this.props.userID + "/" + this.props.file.name;
     console.log(viewerUrl + userPath);
     return (
       <tr>
         <th>
           <a target="_blank" href={viewerUrl + userPath}>
-            {this.props.filename}
+            {this.props.file.name}
           </a>
         </th>
-        <th className="size">0.5KB</th>
-        <th className="upload-time">9/9/2016 3:45</th>
+        <th className="size">{(this.props.file.size/1000000).toFixed(2)} MB</th>
       </tr>
     )
   }
