@@ -109,7 +109,7 @@ class FailedUploadAlert extends React.Component {
 const UploadBox = (props) => {
   return (
     <div className="UploadBox">
-      {/*<Picker />*/}
+      <Picker />
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
           <span> Drag and drop PDFs or click the box to upload </span>
@@ -138,6 +138,7 @@ const FileList = (props) => {
           <tr>
             <th>Name</th>
             <th className="size">Size</th>
+            <th className="delete-cross"></th>
           </tr>
         </thead>
         <tbody>
@@ -160,12 +161,15 @@ class File extends React.Component {
     console.log(viewerUrl + userPath);
     return (
       <tr>
-        <th>
+        <td>
           <a target="_blank" href={viewerUrl + userPath}>
             {this.props.file.name}
           </a>
-        </th>
-        <th className="size">{(this.props.file.size/1000000).toFixed(2)} MB</th>
+        </td>
+        <td className="size">{(this.props.file.size/1000000).toFixed(2)} MB</td>
+        <td href="#" className="delete-cross">
+          <a target="#"> &times; </a>
+        </td>
       </tr>
     )
   }

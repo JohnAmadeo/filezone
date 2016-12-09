@@ -58,7 +58,8 @@ body {
   table-layout: fixed;
 }
 
-#app .FileList th {
+#app .FileList th, td {
+
   font-size: 14px;
   font-weight: normal;
   overflow: hidden;
@@ -67,8 +68,17 @@ body {
 }
 
 #app .FileList .size {
-  text-align: left;
   width: 70px;
+}
+
+#app .FileList .delete-cross {
+  width: 55px;
+  font-size: 22px;
+  padding-top: 0px;
+}
+
+#app .FileList .delete-cross a {
+  cursor: pointer;
 }
 
 #app .FileList th:nth-child(1) {
