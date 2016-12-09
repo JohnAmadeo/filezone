@@ -35,13 +35,15 @@ class Storage extends React.Component {
     super(props);
     this.onDrop = this.onDrop.bind(this);
     this.state = {
-      filenameList: ['test.pdf'],
+      filenameList: [],
+      rejectedFilenameList: [],
       userID: UUID()
     }
   }
   onDrop(acceptedFiles, rejectedFiles) {   
     var acceptedFilenameList = acceptedFiles.map((file) => file.name);
-    
+    var rejectedFilenameList = rejectedFiles.map((file) => file.name);
+
     {/* Send PDF to Flask back-end via POST request */}
     var req = Request.post('/upload');
     req.set('userID', this.state.userID);
@@ -58,12 +60,14 @@ class Storage extends React.Component {
     })  
     
     this.setState({
-      filenameList: [...this.state.filenameList, ...acceptedFilenameList]
+      filenameList: [...this.state.filenameList, ...acceptedFilenameList],
+      rejectedFilenameList: rejectedFilenameList
     });
   }
   render() {
     return (
       <div className="Storage container">
+        <FailedUploadAlert rejectedFilenameList={this.state.rejectedFilenameList}/>
         <UploadBox onDrop={this.onDrop} />
         <FileList filenameList={this.state.filenameList} 
                   userID={this.state.userID}/>
@@ -74,22 +78,24 @@ class Storage extends React.Component {
 
 Storage.propTypes = {
   filenameList: React.PropTypes.arrayOf(React.PropTypes.string),
+  rejectedFilenameList: React.PropTypes.arrayOf(React.PropTypes.string),
   userID: React.PropTypes.string
 }
 
-{/*class FailedUploadAlert extends React.Component {
+class FailedUploadAlert extends React.Component {
   constructor(props) {
     super(props);
   }
   render() {
-    var errorFilenameList = this.props.errorFilenameList;
-    if(errorFilenameList && errorFilenameList.length > 0) {
+    var rejectedFilenameList = this.props.rejectedFilenameList;
+    if(rejectedFilenameList && rejectedFilenameList.length > 0) {
       return (
         <div className="alert alert-danger alert-dismissible" role="alert">
           <button type="button" className="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-          Sorry! {this.props.errorFilenameList.join(', ')} could not be uploaded. Please check .
+          Sorry! <strong> {rejectedFilenameList.join(', ')} </strong> 
+          could not be uploaded because they are not PDFs.
         </div>
       )    
     }
@@ -97,7 +103,7 @@ Storage.propTypes = {
       return null;
     }
   }
-}*/}
+}
 
 const UploadBox = (props) => {
   return (
@@ -159,7 +165,7 @@ class File extends React.Component {
     return (
       <tr>
         <th>
-          <a href={viewerUrl + userPath}>
+          <a target="_blank" href={viewerUrl + userPath}>
             {this.props.filename}
           </a>
         </th>
