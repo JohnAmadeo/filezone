@@ -65,7 +65,8 @@ class Storage extends React.Component {
     return (
       <div className="Storage container">
         <UploadBox onDrop={this.onDrop} />
-        <FileList filenameList={this.state.filenameList} />
+        <FileList filenameList={this.state.filenameList} 
+                  userID={this.state.userID}/>
       </div>
     )
   }
@@ -135,7 +136,7 @@ const FileList = (props) => {
         </thead>
         <tbody>
           {props.filenameList.map((filename, index) => (
-            <File filename={filename} key={index}/>
+            <File filename={filename} userID={props.userID} key={index}/>
           ))}
         </tbody>
       </table>
@@ -152,10 +153,13 @@ class File extends React.Component {
     console.log(this.props.filename);
   }
   render() {
+    var viewerUrl = "https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=";
+    var userPath = "../pdf/" + this.props.userID + "/" + this.props.filename;
+    console.log(viewerUrl + userPath);
     return (
       <tr>
         <th>
-          <a href={"https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=" + this.props.filename}>
+          <a href={viewerUrl + userPath}>
             {this.props.filename}
           </a>
         </th>

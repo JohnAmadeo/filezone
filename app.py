@@ -4,8 +4,6 @@ import os
 
 app = Flask(__name__)
 
-AZURE_CONTAINER_URL = 'https://filezone.blob.core.windows.net/filezone-static/pdf/'
-
 @app.route('/')
 def hello_world():
     return render_template('index.html')    
@@ -18,7 +16,7 @@ def upload():
     for key in pdf_keys:
         pdf_object = pdf_dictionary[key]
         pdf_object.save('/tmp/' + key)
-        pdf_object.save(key)
+        # pdf_object.save(key)
         storePDFInAzure('/tmp/' + key, key, user_id)
 
     return make_response()
