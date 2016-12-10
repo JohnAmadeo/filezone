@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import Dropzone from 'react-dropzone';
 import Request from 'superagent';
 import UUID from 'uuid/v4';
-import Store from 'store';
+import Store from 'store2';
 
 class Main extends React.Component {
   constructor(props) {
@@ -36,29 +36,30 @@ class Storage extends React.Component {
     super(props);
     this.onDrop = this.onDrop.bind(this);
     this.onDelete = this.onDelete.bind(this);
-    this.getExistingState = this.getExistingState.bind(this);
+    this.getLocalPersistentState = this.getLocalPersistentState.bind(this);
 
-    var existingState = this.getExistingState();
+    {/* Retrieve state values from previous sessions stored
+        on localStorage using store.js library */}
+    var localPersistentState = this.getLocalPersistentState();
 
     this.state = {
-      acceptedFilesData: [],
+      acceptedFilesData: localPersistentState.acceptedFilesData,
       rejectedFilesData: [],
-      userID: UUID()
+      userID: localPersistentState.userID
     }
-
-    {/*this.state = {
-      acceptedFiles: existingState.acceptedFiles,
-      rejectedFiles: [],
-      userID: existingState.userID
-    }*/}
   }
-  getExistingState() {
-    {/*var acceptedFilenames = Store.get('acceptedFilenamesAndSizes') ? 
-                            Store.get('filezoneAcceptedFilenames') : [];
-    var userID = Store.get('filezoneUserID') ? 
-                 Store.get('filezoneUserID') : UUID();
+  getLocalPersistentState() {
+    var acceptedFilesData = Store.session.get('acceptedFilesData') ? 
+                            Store.session.get('acceptedFilesData') : [];
 
-    var acceptedFiles*/}
+    var userID = Store.session.get('userID') ? 
+                 Store.session.get('userID') : UUID();
+    Store.session.set('userID', userID);
+
+    return {
+      'acceptedFilesData': acceptedFilesData,
+      'userID': userID
+    }
   }
   onDrop(acceptedFiles, rejectedFiles) {   
     {/* Send PDF to Flask back-end via POST request */}
@@ -88,6 +89,7 @@ class Storage extends React.Component {
       acceptedFilesData: newAcceptedFilesData,
       rejectedFilesData: newRejectedFilesData
     });
+    Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
   onDelete(fileData, e) {
     e.preventDefault();
@@ -105,6 +107,7 @@ class Storage extends React.Component {
     this.setState({
       acceptedFilesData: newAcceptedFilesData
     });
+    Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
   render() {
     return (
