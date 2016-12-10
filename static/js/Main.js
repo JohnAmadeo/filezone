@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import Dropzone from 'react-dropzone';
 import Request from 'superagent';
 import UUID from 'uuid/v4';
+import Store from 'store';
 
 class Main extends React.Component {
   constructor(props) {
@@ -35,11 +36,29 @@ class Storage extends React.Component {
     super(props);
     this.onDrop = this.onDrop.bind(this);
     this.onDelete = this.onDelete.bind(this);
+    this.getExistingState = this.getExistingState.bind(this);
+
+    var existingState = this.getExistingState();
+
     this.state = {
-      acceptedFiles: [],
-      rejectedFiles: [],
+      acceptedFilesData: [],
+      rejectedFilesData: [],
       userID: UUID()
     }
+
+    {/*this.state = {
+      acceptedFiles: existingState.acceptedFiles,
+      rejectedFiles: [],
+      userID: existingState.userID
+    }*/}
+  }
+  getExistingState() {
+    {/*var acceptedFilenames = Store.get('acceptedFilenamesAndSizes') ? 
+                            Store.get('filezoneAcceptedFilenames') : [];
+    var userID = Store.get('filezoneUserID') ? 
+                 Store.get('filezoneUserID') : UUID();
+
+    var acceptedFiles*/}
   }
   onDrop(acceptedFiles, rejectedFiles) {   
     {/* Send PDF to Flask back-end via POST request */}
@@ -51,32 +70,48 @@ class Storage extends React.Component {
     req.end((err, res) => {
       console.log(res.statusText);
     })  
-    
+
+    var acceptedFilesData = acceptedFiles.map(function(file) {
+      return {
+        'name': file.name,
+        'size': (file.size /1000000).toFixed(2)
+      }
+    });
+    var newAcceptedFilesData = 
+      [...this.state.acceptedFilesData, ...acceptedFilesData];
+
+    var newRejectedFilesData = rejectedFiles.map(function(file) {
+      return {'name': file.name}
+    })
+
     this.setState({
-      acceptedFiles: [...this.state.acceptedFiles, ...acceptedFiles],
-      rejectedFiles: rejectedFiles
+      acceptedFilesData: newAcceptedFilesData,
+      rejectedFilesData: newRejectedFilesData
     });
   }
-  onDelete(file, e) {
+  onDelete(fileData, e) {
     e.preventDefault();
-    var fileIndex = this.state.acceptedFiles.indexOf(file);
+    var fileIndex = this.state.acceptedFilesData.indexOf(fileData);
 
     {/* Request back-end to delete file from Azure via POST*/}
     var req = Request.post('/delete');
     req.set('userID', this.state.userID)
-       .send({userID: this.state.acceptedFiles[fileIndex].name})
+       .send({userID: this.state.acceptedFilesData[fileIndex].name})
        .end((err, res) => {console.log(res.statusText);});
 
+    var newAcceptedFilesData = 
+      this.state.acceptedFilesData.filter((_, index) => index != fileIndex);
+    
     this.setState({
-      acceptedFiles: this.state.acceptedFiles.filter((_, index) => index != fileIndex)
-    })
+      acceptedFilesData: newAcceptedFilesData
+    });
   }
   render() {
     return (
       <div className="Storage container">
-        <FailedUploadAlert rejectedFiles={this.state.rejectedFiles}/>
+        <FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>
         <UploadBox onDrop={this.onDrop} />
-        <FileList acceptedFiles={this.state.acceptedFiles} 
+        <FileList acceptedFilesData={this.state.acceptedFilesData} 
                   userID={this.state.userID} 
                   onDelete={this.onDelete}/>
       </div>
@@ -85,8 +120,8 @@ class Storage extends React.Component {
 }
 
 Storage.propTypes = {
-  acceptedFiles: React.PropTypes.arrayOf(React.PropTypes.object),
-  rejectedFiles: React.PropTypes.arrayOf(React.PropTypes.object),
+  acceptedFilesData: React.PropTypes.arrayOf(React.PropTypes.object),
+  rejectedFilesData: React.PropTypes.arrayOf(React.PropTypes.object),
   userID: React.PropTypes.string
 }
 
@@ -95,9 +130,9 @@ class FailedUploadAlert extends React.Component {
     super(props);
   }
   render() {
-    var rejectedFiles = this.props.rejectedFiles;
-    var rejectedFilenames = rejectedFiles.map((file) => file.name);
-    if(rejectedFiles && rejectedFiles.length > 0) {
+    var rejectedFilesData = this.props.rejectedFilesData;
+    var rejectedFilenames = rejectedFilesData.map((fileData) => fileData.name);
+    if(rejectedFilesData && rejectedFilesData.length > 0) {
       return (
         <div className="alert alert-danger alert-dismissible" role="alert">
           <button type="button" className="close" data-dismiss="alert" aria-label="Close">
@@ -151,8 +186,8 @@ const FileList = (props) => {
           </tr>
         </thead>
         <tbody>
-          {props.acceptedFiles.map((file, index) => (
-            <File file={file} userID={props.userID} 
+          {props.acceptedFilesData.map((fileData, index) => (
+            <File fileData={fileData} userID={props.userID} 
                   key={index} onDelete={props.onDelete}/>
           ))}
         </tbody>
@@ -167,18 +202,17 @@ class File extends React.Component {
   }
   render() {
     var viewerUrl = "https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=";
-    var userPath = "../pdf/" + this.props.userID + "/" + this.props.file.name;
-    var fileSize = (this.props.file.size/1000000).toFixed(2)
+    var userPath = "../pdf/" + this.props.userID + "/" + this.props.fileData.name;
     return (
       <tr>
         <td>
           <a target="_blank" href={viewerUrl + userPath}>
-            {this.props.file.name}
+            {this.props.fileData.name}
           </a>
         </td>
-        <td className="size">{fileSize} MB</td>
+        <td className="size">{this.props.fileData.size} MB</td>
         <td className="delete-cross">
-          <a target="#" onClick={this.props.onDelete.bind(this, this.props.file)}> 
+          <a target="#" onClick={this.props.onDelete.bind(this, this.props.fileData)}> 
             &times; 
           </a>
         </td>
