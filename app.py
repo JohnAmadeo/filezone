@@ -6,7 +6,6 @@ import json
 import re
 import requests
 import sys
-import urllib2
 
 app = Flask(__name__)
 
