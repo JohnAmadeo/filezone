@@ -193,17 +193,27 @@ class DropboxPicker extends React.Component {
     super(props);
     this.onLoadChooser = this.onLoadChooser.bind(this);
     this.onChooseFiles = this.onChooseFiles.bind(this);
+    // this.onChooseFiles([{'link': "https://dl.dropboxusercontent.com/1/view/05yfibufn60c5bw/hw1.pdf"}]);
   }
   onChooseFiles(files) {
+    console.log(files);
+    var fileUrlList = files.map((file) => file.link);
     console.log(JSON.stringify(files.map((file) => file.link)));
     var req = Request.post('/download_from_dropbox_and_store');
     req.set('userID', this.props.userID)
        .set('Content-Type', 'application/json')
        .send({
-          'fileURLList': JSON.stringify(files.map((file) => file.link))
+          'fileUrlList': JSON.stringify(fileUrlList)
        })
        .end((err, res) => {console.log(res.statusText);})
-  }
+
+    var newAcceptedFilesData = fileUrlList.map((fileUrl) => {
+      var tokenList = fileUrl.split('/'); 
+      return tokenList[tokenList.length - 1]
+    })
+
+    console.log(newAcceptedFilesData);
+  } 
   onLoadChooser() {
     Dropbox.choose({
       success: this.onChooseFiles,
