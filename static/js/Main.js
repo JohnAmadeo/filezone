@@ -124,7 +124,7 @@ class Storage extends React.Component {
     return (
       <div className="Storage container">
         <FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>
-        <UploadBox onDrop={this.onDrop} />
+        <UploadBox onDrop={this.onDrop} userID={this.state.userID}/>
         <FileList acceptedFilesData={this.state.acceptedFilesData} 
                   userID={this.state.userID} 
                   onDelete={this.onDelete}/>
@@ -167,7 +167,7 @@ class FailedUploadAlert extends React.Component {
 const UploadBox = (props) => {
   return (
     <div className="UploadBox">
-      <PickerBar />
+      <PickerBar userID={props.userID}/>
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
           <span> Drag and drop PDFs or click the box to upload </span>
@@ -182,7 +182,7 @@ const PickerBar = (props) => {
   return (
     <div className="PickerBar btn-group" role="group" aria-label="...">
       <button type="button" className="btn btn-default">Computer</button>
-      <DropboxPicker />
+      <DropboxPicker userID={props.userID}/>
       <GDrivePicker />
     </div>
   )
