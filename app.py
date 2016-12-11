@@ -92,11 +92,16 @@ def get_unique_name(filename, filename_list):
 
 @app.route('/download_from_dropbox_and_store', methods=['POST'])
 def download_from_dropbox_and_store():
+    print('before payload')
     payload = (request.get_json())
+    print('before file_url_list')
     file_url_list = json.loads(payload['fileURLList'])
+    print('before user_id')
     user_id = request.headers['userID']
     for file_url in file_url_list:
+        print('before local_file_path')
         local_file_path = download_file(file_url)
+        print('before store pdf in azure')
         store_PDF_in_azure(local_file_path, 
                            local_file_path.split('/')[-1],
                            userid)
