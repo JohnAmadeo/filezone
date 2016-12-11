@@ -196,6 +196,7 @@ class DropboxPicker extends React.Component {
   onLoadChooser() {
     Dropbox.choose({
       success: function(files) {
+        console.log(this);
         var req = Request.post('/download_from_dropbox_and_store');
         req.set('userID', this.props.userID)
            .set('Content-Type', 'application/json')
