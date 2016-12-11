@@ -36,6 +36,7 @@ class Storage extends React.Component {
     super(props);
     this.onDrop = this.onDrop.bind(this);
     this.onDelete = this.onDelete.bind(this);
+    this.onRenameDuplicateFiles = this.onRenameDuplicateFiles.bind(this);
     this.getLocalPersistentState = this.getLocalPersistentState.bind(this);
 
     {/* Retrieve state values from previous sessions stored
@@ -48,7 +49,6 @@ class Storage extends React.Component {
       userID: localPersistentState.userID
     }
   }
-
   getLocalPersistentState() {
     var acceptedFilesData = Store.session.get('acceptedFilesData') ? 
                             Store.session.get('acceptedFilesData') : [];
@@ -62,24 +62,33 @@ class Storage extends React.Component {
       'userID': userID
     }
   }
+  onRenameDuplicateFiles(acceptedFiles, error, response) {
+    var newAcceptedFilesData = response.body;
+    var offset = this.state.acceptedFilesData.length;
+    console.log(acceptedFiles);
 
-  renameDuplicates(acceptedFiles) {
-    var stateAcceptedFilesData = copyObjectWoFunctions(this.state.acceptedFilesData); 
-    for(let file of acceptedFiles) {
-      while(hasDuplicateName(file.name, stateAcceptedFilesData)) {
-        file.name = getUniqueName(file.name);
-      }
-      stateAcceptedFilesData.push(getNameAndSizePair(file));
-    }
+    var req = Request.post('/upload');
+    req.set('userID', this.state.userID);
+    acceptedFiles.map((file, index) => {
+      req.attach(newAcceptedFilesData[index + offset]['name'], file);
+    });
+    req.end((err, res) => {console.log(res.statusText);});
+
+    this.setState({
+      acceptedFilesData: newAcceptedFilesData
+    })    
+    Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
-
   onDrop(acceptedFiles, rejectedFiles) {  
-    {/*// send post request to server
-    // (acceptedFilesData, newAcceptedFilesData)
-    // need array to JSON
-    // retrieve (combinedAcceptedFilesDataNoDuplicates,
-    //           newAcceptedFilesDataNoDuplicates)*/}
+    {/* Update rejectedFilesData */}
+    var newRejectedFilesData = rejectedFiles.map(function(file) {
+      return {'name': file.name}
+    })
+    this.setState({
+      rejectedFilesData: newRejectedFilesData
+    });
 
+    {/* Update acceptedFilesData */}
     var req = Request.post('/rename_duplicates');
     req.set('Content-Type', 'application/json')
        .send({
@@ -91,41 +100,7 @@ class Storage extends React.Component {
             }
           })  
        })
-       .end((err, res) => res);
-
-    {/*// iterate through newAcceptedFilesData and alter 
-    // name of files in acceptedFiles
-
-    // set this.state.acceptedFilesData to 
-    // combinedAcceptedFilesDataNoDuplicates*/}
-
-    {/* Send PDF to Flask back-end via POST request */}
-    var req = Request.post('/upload');
-    req.set('userID', this.state.userID);
-    acceptedFiles.map((file) => {
-      req.attach(file.name, file);
-    });
-    req.end((err, res) => {console.log(res.statusText);});  
-
-    var acceptedFilesData = acceptedFiles.map(function(file) {
-      return {
-        'name': file.name,
-        'size': (file.size /1000000).toFixed(2)
-      }
-    });
-
-    var newAcceptedFilesData = 
-      [...this.state.acceptedFilesData, ...acceptedFilesData];
-
-    var newRejectedFilesData = rejectedFiles.map(function(file) {
-      return {'name': file.name}
-    })
-
-    this.setState({
-      acceptedFilesData: newAcceptedFilesData,
-      rejectedFilesData: newRejectedFilesData
-    });
-    Store.session.set('acceptedFilesData', newAcceptedFilesData);
+       .end(this.onRenameDuplicateFiles.bind(this, acceptedFiles));
   }
   onDelete(fileData, e) {
     e.preventDefault();
@@ -145,7 +120,6 @@ class Storage extends React.Component {
     });
     Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
-
   render() {
     return (
       <div className="Storage container">

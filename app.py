@@ -1,5 +1,5 @@
 from __future__ import print_function
-from flask import Flask, render_template, request, redirect, make_response
+from flask import Flask, render_template, request, redirect, make_response, Response
 from azure.storage.blob import BlockBlobService, ContentSettings
 import os
 import json
@@ -30,14 +30,14 @@ def upload():
     return make_response()
 
 def storePDFInAzure(local_path_to_file, filename, user_id):
-    print('Uploading ' + filename)
+    # print('Uploading ' + filename)
     BLOCK_BLOB_SERVICE.create_blob_from_path(
         container_name='filezone-static',
         blob_name='pdf/' + user_id + '/' + filename,
         file_path=local_path_to_file,
         content_settings=ContentSettings(content_type='application/pdf')
     )
-    print('Successfully uploaded ' + filename)
+    # print('Successfully uploaded ' + filename)
 
 @app.route('/delete', methods=['POST'])
 def delete():
@@ -68,26 +68,11 @@ def rename_duplicates():
         }
         file_data_list.append(renamed_file_data)
 
-    print("New File Datas")
-    print(file_data_list)
-    return make_response()
-    # r = requests.post("https://graph.facebook.com/v2.6/me/messages",
-    #     params = {"access_token": token},
-    #     data=json.dumps({
-    #         "recipient": {"id": recipient},
-    #         "message": {
-    #             "attachment": {
-    #                 "type":"image",
-    #                 "payload": { "url": imageurl}
-    #             }
-    #         }
-    #     }),
-    #     headers={'Content-type': 'application/json'})
+    return Response(response=json.dumps(file_data_list), 
+                    status=200, 
+                    mimetype='application/json')
 
 def get_unique_name(filename, filename_list):
-    print("Filename List: ")
-    print(filename_list)
-    print("Initial filename: ", filename)
     while filename in filename_list:
         number_id_substring_list = re.findall(r"\([0-9]+\)\.pdf", filename)
         if number_id_substring_list:
@@ -101,7 +86,6 @@ def get_unique_name(filename, filename_list):
         else:
             filename = filename.split('.')[0] + '(1).pdf'
 
-    print("New filename: ", filename)
     return filename
 
 if __name__ == '__main__':
