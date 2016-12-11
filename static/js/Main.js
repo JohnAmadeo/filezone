@@ -198,7 +198,10 @@ class DropboxPicker extends React.Component {
   onChooseFiles(files) {
     console.log(files);
     var fileUrlList = files.map((file) => file.link);
-    console.log(JSON.stringify(files.map((file) => file.link)));
+    console.log('fileUrlList')
+    console.log(fileUrlList);
+    console.log('JSON.stringify(fileUrlList)')
+    console.log(JSON.stringify(fileUrlList));
     var req = Request.post('/download_from_dropbox_and_store');
     req.set('userID', this.props.userID)
        .set('Content-Type', 'application/json')
@@ -207,9 +210,13 @@ class DropboxPicker extends React.Component {
        })
        .end((err, res) => {console.log(res.statusText);})
 
-    var newAcceptedFilesData = fileUrlList.map((fileUrl) => {
-      var tokenList = fileUrl.split('/'); 
-      return tokenList[tokenList.length - 1]
+    var newAcceptedFilesData = files.map((file) => {
+      var tokenList = file.link.split('/'); 
+      var filename = tokenList[tokenList.length - 1];
+      return {
+        'name': filename,
+        'size': (file.bytes /1000000).toFixed(2)
+      }
     })
 
     console.log(newAcceptedFilesData);

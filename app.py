@@ -95,6 +95,9 @@ def download_from_dropbox_and_store():
     print('before payload')
     payload = (request.get_json())
     print('before file_url_list')
+    print(payload)
+    print(payload['fileUrlList'])
+    print(payload['fileUrlList'][0])
     file_url_list = json.loads(payload['fileUrlList'])
     print('before user_id')
     user_id = request.headers['userID']
