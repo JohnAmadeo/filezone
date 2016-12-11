@@ -6,6 +6,7 @@ import json
 import re
 import requests
 import sys
+import urllib.parse
 
 app = Flask(__name__)
 
@@ -19,6 +20,8 @@ def serve_index():
     # return render_template('gdrive.html')
     return render_template('index.html')    
 
+
+
 @app.route('/upload', methods=['POST'])
 def upload():
     user_id = request.headers['userid']
@@ -27,7 +30,9 @@ def upload():
     for filename in pdf_filenames:
         pdf_object = pdf_dictionary[filename]
         pdf_object.save('/tmp/' + filename)
-        store_PDF_in_azure('/tmp/' + filename, filename, user_id)
+        store_PDF_in_azure(local_path_to_file='/tmp/' + filename, 
+                           filename=filename, 
+                           user_id=user_id)
 
     return make_response()
 
@@ -40,6 +45,8 @@ def store_PDF_in_azure(local_path_to_file, filename, user_id):
         content_settings=ContentSettings(content_type='application/pdf')
     )
     print('Successfully uploaded ' + filename)
+
+
 
 @app.route('/delete', methods=['POST'])
 def delete():
@@ -56,6 +63,8 @@ def remove_PDF_from_azure(filename, user_id):
         blob_name='pdf/' + user_id + '/' + filename
     )
     print('Successfully deleted ' + filename)
+
+
 
 @app.route('/rename_duplicates', methods=['POST'])
 def rename_duplicates():
@@ -90,24 +99,21 @@ def get_unique_name(filename, filename_list):
 
     return filename
 
+
+
 @app.route('/download_from_dropbox_and_store', methods=['POST'])
 def download_from_dropbox_and_store():
-    print('before payload')
-    payload = (request.get_json())
-    print('before file_url_list')
-    print(payload)
-    print(payload['fileUrlList'])
-    print(payload['fileUrlList'][0])
-    file_url_list = json.loads(payload['fileUrlList'])
-    print('before user_id')
+    file_url_list = (request.get_json())['fileUrlList']
+    filename_list = (request.get_json())['filenameList']
     user_id = request.headers['userID']
-    for file_url in file_url_list:
+
+    for index, file_url in enumerate(file_url_list):
         print('before local_file_path')
         local_file_path = download_file(file_url)
         print('before store pdf in azure')
-        store_PDF_in_azure(local_file_path, 
-                           local_file_path.split('/')[-1],
-                           user_id)
+        store_PDF_in_azure(local_path_to_file=local_file_path, 
+                           filename=filename_list[index],
+                           user_id=user_id)
 
     return Response(response={}, 
                     status=200, 

@@ -34,10 +34,15 @@ const Header = (props) => {
 class Storage extends React.Component {
   constructor(props) {
     super(props);
+    this.getLocalPersistentState = this.getLocalPersistentState.bind(this);
     this.onDrop = this.onDrop.bind(this);
     this.onDelete = this.onDelete.bind(this);
-    this.onRenameDuplicateFiles = this.onRenameDuplicateFiles.bind(this);
-    this.getLocalPersistentState = this.getLocalPersistentState.bind(this);
+    this.onLoadChooser = this.onLoadChooser.bind(this);
+
+    this.renameDuplicateFiles = this.renameDuplicateFiles.bind(this);
+    this.storeFileData = this.storeFileData.bind(this);
+    this.storeFileToAzure = this.storeFileToAzure.bind(this);
+    this.storeFileDataToState = this.storeFileDataToState.bind(this);    
 
     {/* Retrieve state values from previous sessions stored
         on localStorage using store.js library */}
@@ -72,31 +77,65 @@ class Storage extends React.Component {
     });
 
     {/* Update acceptedFilesData */}
+    this.renameDuplicateFiles(acceptedFiles);
+  }
+  onLoadChooser() {
+    Dropbox.choose({
+      success: this.renameDuplicateFilesDBox,
+      cancel: function() {console.log("No files uploaded");},
+      linkType: "direct",
+      multiselect: true,
+      extensions: ['.pdf']
+    });
+  }
+  renameDuplicateFiles(acceptedFiles) {
+
     var req = Request.post('/rename_duplicates');
     req.set('Content-Type', 'application/json')
        .send({
           'filesData': this.state.acceptedFilesData,
           'newFilesData': acceptedFiles.map(function(file) {
+            var size = 'size' in file ? (file.size /1000000).toFixed(2) :
+                                        (file.bytes /1000000).toFixed(2)
             return {
               'name': file.name,
-              'size': (file.size /1000000).toFixed(2)
+              'size': size
             }
           })  
        })
-       .end(this.onRenameDuplicateFiles.bind(this, acceptedFiles));
+       .end(this.storeFileData.bind(this, acceptedFiles));
   }
-  onRenameDuplicateFiles(acceptedFiles, error, response) {
-    var newAcceptedFilesData = response.body;
+  storeFileData(acceptedFiles, error, response) {
+    this.storeFileToAzure(acceptedFiles, response);  
+    this.storeFileDataToState(response);
+  }
+  storeFileToAzure(acceptedFiles, response) {
     var offset = this.state.acceptedFilesData.length;
-    console.log(acceptedFiles);
+    var filenameList = response.body.splice(0, offset)
+                                    .map((file) => file['name']);
+    var fileUrlList = acceptedFiles.map((file) => file.link);
 
-    var req = Request.post('/upload');
-    req.set('userID', this.state.userID);
-    acceptedFiles.map((file, index) => {
-      req.attach(newAcceptedFilesData[index + offset]['name'], file);
-    });
-    req.end((err, res) => {console.log(res.statusText);});
-
+    if('size' in acceptedFiles[0]) {
+      var req = Request.post('/upload');
+      req.set('userID', this.state.userID);
+      acceptedFiles.map((file, index) => {
+        req.attach(filenameList['name'], file);
+      });
+      req.end((err, res) => {console.log(res.statusText);});
+    }
+    else if('bytes' in acceptedFiles[0]) {
+      var req = Request.post('/download_from_dropbox_and_store');
+      req.set('userID', this.props.userID)
+         .set('Content-Type', 'application/json')
+         .send({
+            'fileUrlList': fileUrlList,
+            'filenameList': filenameList
+         })
+         .end((err, res) => {console.log(res.statusText);})      
+    }
+  }
+  storeFileDataToState(response) {
+    var newAcceptedFilesData = response.body;
     this.setState({
       acceptedFilesData: newAcceptedFilesData
     })    
@@ -124,7 +163,8 @@ class Storage extends React.Component {
     return (
       <div className="Storage container">
         <FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>
-        <UploadBox onDrop={this.onDrop} userID={this.state.userID}/>
+        <UploadBox onDrop={this.onDrop} userID={this.state.userID}
+                   onLoadChooser={this.onLoadChooser}/>
         <FileList acceptedFilesData={this.state.acceptedFilesData} 
                   userID={this.state.userID} 
                   onDelete={this.onDelete}/>
@@ -167,7 +207,7 @@ class FailedUploadAlert extends React.Component {
 const UploadBox = (props) => {
   return (
     <div className="UploadBox">
-      <PickerBar userID={props.userID}/>
+      <PickerBar userID={props.userID} onLoadChooser={props.onLoadChooser}/>
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
           <span> Drag and drop PDFs or click the box to upload </span>
@@ -182,136 +222,15 @@ const PickerBar = (props) => {
   return (
     <div className="PickerBar btn-group" role="group" aria-label="...">
       <button type="button" className="btn btn-default">Computer</button>
-      <DropboxPicker userID={props.userID}/>
-      <GDrivePicker />
+      <DropboxPicker userID={props.userID} onLoadChooser={props.onLoadChooser}/>
     </div>
   )
 }
 
-class DropboxPicker extends React.Component {
-  constructor(props) {
-    super(props);
-    this.onLoadChooser = this.onLoadChooser.bind(this);
-    this.onChooseFiles = this.onChooseFiles.bind(this);
-    // this.onChooseFiles([{'link': "https://dl.dropboxusercontent.com/1/view/05yfibufn60c5bw/hw1.pdf"}]);
-  }
-  onChooseFiles(files) {
-    console.log(files);
-    var fileUrlList = files.map((file) => file.link);
-    console.log('fileUrlList')
-    console.log(fileUrlList);
-    console.log('JSON.stringify(fileUrlList)')
-    console.log(JSON.stringify(fileUrlList));
-    var req = Request.post('/download_from_dropbox_and_store');
-    req.set('userID', this.props.userID)
-       .set('Content-Type', 'application/json')
-       .send({
-          'fileUrlList': JSON.stringify(fileUrlList)
-       })
-       .end((err, res) => {console.log(res.statusText);})
-
-    var newAcceptedFilesData = files.map((file) => {
-      var tokenList = file.link.split('/'); 
-      var filename = tokenList[tokenList.length - 1];
-      return {
-        'name': filename,
-        'size': (file.bytes /1000000).toFixed(2)
-      }
-    })
-
-    console.log(newAcceptedFilesData);
-  } 
-  onLoadChooser() {
-    Dropbox.choose({
-      success: this.onChooseFiles,
-      cancel: function() {console.log("cancelled");},
-      linkType: "direct",
-      multiselect: true,
-      extensions: ['.pdf']
-    });
-  }
-  render() {
-    return (
-      <button type="button" className="btn btn-default" onClick={this.onLoadChooser}>Dropbox</button>
-    )
-  }  
-}
-
-class GDrivePicker extends React.Component {
-  constructor(props) {
-    super(props);
-    this.onAPILoad = this.onAPILoad.bind(this);  
-    this.onAuthAPILoad = this.onAuthAPILoad.bind(this);  
-    this.onPickerAPILoad = this.onPickerAPILoad.bind(this);  
-    this.handleAuthResult = this.handleAuthResult.bind(this);  
-    this.createPicker = this.createPicker.bind(this);  
-    this.pickerCallback = this.pickerCallback.bind(this);  
- 
-    this.pickerAPILoaded = false;
-    this.ouathToken = null;
-
-    this.state = {
-      developerKey: 'AIzaSyAy78NbLhvA5SVrEnl1Fzz6ZYoCrlhgbzU',
-      clientId: "343430651263-kncjsdfet1kn51g5toumoiklde3rb4o9.apps.googleusercontent.com",
-      scope: ['https://www.googleapis.com/auth/drive.readonly']
-    }
-  }
-  onAPILoad() { 
-    console.log('onAPILoad Start');
-    console.log(gapi);
-    gapi.load('auth', {'callback': this.onAuthApiLoad});
-    gapi.load('picker', {'callback': this.onPickerApiLoad});
-    console.log('onAPILoad End');
-  }
-  onAuthAPILoad() {
-    console.log('onAuthAPILoad');
-    window.gapi.auth.authorize(
-        {
-          'client_id': this.state.clientId,
-          'scope': this.state.scope,
-          'immediate': false
-        },
-        this.handleAuthResult
-    );
-  }
-  onPickerAPILoad() {
-    console.log('onPickerAPILoad');
-    this.pickerApiLoaded = true;
-    createPicker();
-  }
-  handleAuthResult(authResult) {
-    if (authResult && !authResult.error) {
-      this.oauthToken = authResult.access_token;
-      createPicker();
-    }
-  }
-  createPicker() {
-    if (this.pickerApiLoaded && this.oauthToken) {
-      var picker = new google.picker.PickerBuilder().
-          addView(google.picker.ViewId.PDFS).
-          enableFeature(google.picker.Feature.NAV_HIDDEN).
-          enableFeature(google.picker.Feature.MULTISELECT_ENABLED).
-          setOAuthToken(this.oauthToken).
-          setDeveloperKey(this.state.developerKey).
-          setCallback(this.pickerCallback).
-          build();
-      picker.setVisible(true);
-    }
-  }
-  pickerCallback(data) {
-    var url = 'nothing';
-    if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-      var doc = data[google.picker.Response.DOCUMENTS][0];
-      console.log(doc);
-      url = doc[google.picker.Document.URL];
-    }
-    console.log('You picked: ' + url);
-  }
-  render() {
-    return (
-      <button type="button" className="btn btn-default" onClick={this.onAPILoad}>Google Drive</button>
-    )
-  }
+const DropboxPicker = (props) => {
+  return (
+    <button type="button" className="btn btn-default" onClick={props.onLoadChooser}>Dropbox</button>
+  )
 }
 
 const FileList = (props) => {
