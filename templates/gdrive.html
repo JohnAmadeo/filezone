@@ -26,6 +26,7 @@
       }
 
       function onAuthApiLoad() {
+        console.log('onAuthApiLoad');
         window.gapi.auth.authorize(
             {
               'client_id': clientId,
@@ -79,7 +80,7 @@
     <div id="result"></div>
 
     <!-- The Google API Loader script. -->
-    <script type="text/javascript" src="https://apis.google.com/js/api.js?onload="></script>
+    <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
 <!--     <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
  -->  
     </body>
