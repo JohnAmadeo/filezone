@@ -110,16 +110,18 @@ class Storage extends React.Component {
     this.storeFileDataToState(response);
   }
   storeFileToAzure(acceptedFiles, response) {
-    var offset = this.state.acceptedFilesData.length;
-    var filenameList = response.body.splice(0, offset)
-                                    .map((file) => file['name']);
+    console.log(response);
+    var oldLength = this.state.acceptedFilesData.length;
+    var newLength = response.body.length;
+    var filenameList = response.body.map((file) => file.name);
+    filenameList = filenameList.slice(oldLength, newLength);
     var fileUrlList = acceptedFiles.map((file) => file.link);
 
     if('size' in acceptedFiles[0]) {
       var req = Request.post('/upload');
       req.set('userID', this.state.userID);
       acceptedFiles.map((file, index) => {
-        req.attach(filenameList['name'], file);
+        req.attach(filenameList[index], file);
       });
       req.end((err, res) => {console.log(res.statusText);});
     }
