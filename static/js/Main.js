@@ -81,7 +81,7 @@ class Storage extends React.Component {
   }
   onLoadChooser() {
     Dropbox.choose({
-      success: this.renameDuplicateFilesDBox,
+      success: this.renameDuplicateFiles,
       cancel: function() {console.log("No files uploaded");},
       linkType: "direct",
       multiselect: true,
