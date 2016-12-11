@@ -104,7 +104,7 @@ def download_from_dropbox_and_store():
         print('before store pdf in azure')
         store_PDF_in_azure(local_file_path, 
                            local_file_path.split('/')[-1],
-                           userid)
+                           user_id)
 
     return Response(response={}, 
                     status=200, 
