@@ -183,10 +183,24 @@ const PickerBar = (props) => {
     <div className="PickerBar btn-group" role="group" aria-label="...">
       <button type="button" className="btn btn-default">Computer</button>
       <button type="button" className="btn btn-default">Dropbox</button>
-      
       <GDrivePicker />
     </div>
   )
+}
+
+class DropboxPicker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onLoadChooser = this.onLoadChooser.bind(this);
+  }
+  onLoadChooser() {
+    console.log(Dropbox);
+  }
+  render() {
+    return (
+      <button type="button" className="btn btn-default" onClick={this.onLoadChooser}>Dropbox</button>
+    )
+  }  
 }
 
 class GDrivePicker extends React.Component {
@@ -210,6 +224,7 @@ class GDrivePicker extends React.Component {
   }
   onAPILoad() { 
     console.log('onAPILoad Start');
+    console.log(gapi);
     gapi.load('auth', {'callback': this.onAuthApiLoad});
     gapi.load('picker', {'callback': this.onPickerApiLoad});
     console.log('onAPILoad End');
