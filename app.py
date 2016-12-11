@@ -6,6 +6,7 @@ import json
 import re
 import requests
 import sys
+import urllib2
 
 app = Flask(__name__)
 
@@ -15,7 +16,7 @@ BLOCK_BLOB_SERVICE = BlockBlobService(
 )
 
 @app.route('/')
-def hello_world():
+def serve_index():
     # return render_template('gdrive.html')
     return render_template('index.html')    
 
@@ -27,29 +28,29 @@ def upload():
     for filename in pdf_filenames:
         pdf_object = pdf_dictionary[filename]
         pdf_object.save('/tmp/' + filename)
-        storePDFInAzure('/tmp/' + filename, filename, user_id)
+        store_PDF_in_azure('/tmp/' + filename, filename, user_id)
 
     return make_response()
 
-def storePDFInAzure(local_path_to_file, filename, user_id):
-    # print('Uploading ' + filename)
+def store_PDF_in_azure(local_path_to_file, filename, user_id):
+    print('Uploading ' + filename)
     BLOCK_BLOB_SERVICE.create_blob_from_path(
         container_name='filezone-static',
         blob_name='pdf/' + user_id + '/' + filename,
         file_path=local_path_to_file,
         content_settings=ContentSettings(content_type='application/pdf')
     )
-    # print('Successfully uploaded ' + filename)
+    print('Successfully uploaded ' + filename)
 
 @app.route('/delete', methods=['POST'])
 def delete():
     filename = json.loads(request.data.decode('utf-8'))['userID']
     user_id = request.headers['userid']
-    removePDFFromAzure(filename, user_id)
+    remove_PDF_from_azure(filename, user_id)
 
     return make_response()
 
-def removePDFFromAzure(filename, user_id):
+def remove_PDF_from_azure(filename, user_id):
     print('Deleting ' + filename)
     BLOCK_BLOB_SERVICE.delete_blob(
         container_name='filezone-static',
@@ -92,9 +93,28 @@ def get_unique_name(filename, filename_list):
 
 @app.route('/download_from_dropbox_and_store', methods=['POST'])
 def download_from_dropbox_and_store():
-    file_url_list = request.get_json()
+    file_url_list = (request.get_json())['fileUrlList']
+    user_id = request.headers['userid']
+    for file_url in file_url_list:
+        local_file_path = download_file(file_url)
+        store_PDF_in_azure(local_file_path, 
+                           local_file_path.split('/')[-1],
+                           userid)
+
     print(file_url_list)
     sys.stdout.flush()
+    return make_response()
+
+def download_file(url):
+    local_file_path = '/tmp/' + url.split('/')[-1]
+    # NOTE the stream=True parameter
+    r = requests.get(url, stream=True)
+    with open(local_file_path, 'wb') as f:
+        for chunk in r.iter_content(chunk_size=1024): 
+            if chunk: # filter out keep-alive new chunks
+                f.write(chunk)
+                #f.flush() commented by recommendation from J.F.Sebastian
+    return local_file_path
 
 if __name__ == '__main__':
     # app.run(debug=True)
