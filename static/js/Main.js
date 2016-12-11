@@ -48,6 +48,7 @@ class Storage extends React.Component {
       userID: localPersistentState.userID
     }
   }
+
   getLocalPersistentState() {
     var acceptedFilesData = Store.session.get('acceptedFilesData') ? 
                             Store.session.get('acceptedFilesData') : [];
@@ -61,16 +62,50 @@ class Storage extends React.Component {
       'userID': userID
     }
   }
-  onDrop(acceptedFiles, rejectedFiles) {   
+
+  renameDuplicates(acceptedFiles) {
+    var stateAcceptedFilesData = copyObjectWoFunctions(this.state.acceptedFilesData); 
+    for(let file of acceptedFiles) {
+      while(hasDuplicateName(file.name, stateAcceptedFilesData)) {
+        file.name = getUniqueName(file.name);
+      }
+      stateAcceptedFilesData.push(getNameAndSizePair(file));
+    }
+  }
+
+  onDrop(acceptedFiles, rejectedFiles) {  
+    {/*// send post request to server
+    // (acceptedFilesData, newAcceptedFilesData)
+    // need array to JSON
+    // retrieve (combinedAcceptedFilesDataNoDuplicates,
+    //           newAcceptedFilesDataNoDuplicates)*/}
+
+    var req = Request.post('/rename_duplicates');
+    req.set('Content-Type', 'application/json')
+       .send({
+          'filesData': this.state.acceptedFilesData,
+          'newFilesData': acceptedFiles.map(function(file) {
+            return {
+              'name': file.name,
+              'size': (file.size /1000000).toFixed(2)
+            }
+          })  
+       })
+       .end((err, res) => res);
+
+    {/*// iterate through newAcceptedFilesData and alter 
+    // name of files in acceptedFiles
+
+    // set this.state.acceptedFilesData to 
+    // combinedAcceptedFilesDataNoDuplicates*/}
+
     {/* Send PDF to Flask back-end via POST request */}
     var req = Request.post('/upload');
     req.set('userID', this.state.userID);
     acceptedFiles.map((file) => {
       req.attach(file.name, file);
     });
-    req.end((err, res) => {
-      console.log(res.statusText);
-    })  
+    req.end((err, res) => {console.log(res.statusText);});  
 
     var acceptedFilesData = acceptedFiles.map(function(file) {
       return {
@@ -78,6 +113,7 @@ class Storage extends React.Component {
         'size': (file.size /1000000).toFixed(2)
       }
     });
+
     var newAcceptedFilesData = 
       [...this.state.acceptedFilesData, ...acceptedFilesData];
 
@@ -109,6 +145,7 @@ class Storage extends React.Component {
     });
     Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
+
   render() {
     return (
       <div className="Storage container">

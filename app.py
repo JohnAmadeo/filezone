@@ -3,6 +3,8 @@ from flask import Flask, render_template, request, redirect, make_response
 from azure.storage.blob import BlockBlobService, ContentSettings
 import os
 import json
+import re
+import requests
 
 app = Flask(__name__)
 
@@ -52,6 +54,55 @@ def removePDFFromAzure(filename, user_id):
         blob_name='pdf/' + user_id + '/' + filename
     )
     print('Successfully deleted ' + filename)
+
+@app.route('/rename_duplicates', methods=['POST'])
+def rename_duplicates():
+    file_data_list = (request.get_json())['filesData']
+    new_file_data_list = (request.get_json())['newFilesData']
+
+    for file_data in new_file_data_list:
+        filename_list = [file_data['name'] for file_data in file_data_list]
+        renamed_file_data = {
+            'name': get_unique_name(file_data['name'], filename_list),
+            'size': file_data['size']
+        }
+        file_data_list.append(renamed_file_data)
+
+    print("New File Datas")
+    print(file_data_list)
+    return make_response()
+    # r = requests.post("https://graph.facebook.com/v2.6/me/messages",
+    #     params = {"access_token": token},
+    #     data=json.dumps({
+    #         "recipient": {"id": recipient},
+    #         "message": {
+    #             "attachment": {
+    #                 "type":"image",
+    #                 "payload": { "url": imageurl}
+    #             }
+    #         }
+    #     }),
+    #     headers={'Content-type': 'application/json'})
+
+def get_unique_name(filename, filename_list):
+    print("Filename List: ")
+    print(filename_list)
+    print("Initial filename: ", filename)
+    while filename in filename_list:
+        number_id_substring_list = re.findall(r"\([0-9]+\)\.pdf", filename)
+        if number_id_substring_list:
+            number_id_substring = number_id_substring_list[0]
+            number_id = int((re.findall(r"[0-9]+", number_id_substring))[0])
+
+            name_substring = filename.split(number_id_substring)[0]
+            new_number_id_substring = "(" + str(number_id + 1) + ").pdf"
+            
+            filename = name_substring + new_number_id_substring
+        else:
+            filename = filename.split('.')[0] + '(1).pdf'
+
+    print("New filename: ", filename)
+    return filename
 
 if __name__ == '__main__':
     # app.run(debug=True)
