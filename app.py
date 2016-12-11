@@ -106,7 +106,9 @@ def download_from_dropbox_and_store():
                            local_file_path.split('/')[-1],
                            userid)
 
-    return make_response()
+    return Response(response={}, 
+                    status=200, 
+                    mimetype='application/json')
 
 def download_file(url):
     local_file_path = '/tmp/' + url.split('/')[-1]
