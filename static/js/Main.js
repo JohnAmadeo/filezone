@@ -182,7 +182,7 @@ const PickerBar = (props) => {
   return (
     <div className="PickerBar btn-group" role="group" aria-label="...">
       <button type="button" className="btn btn-default">Computer</button>
-      <button type="button" className="btn btn-default">Dropbox</button>
+      <DropboxPicker />
       <GDrivePicker />
     </div>
   )
@@ -195,6 +195,17 @@ class DropboxPicker extends React.Component {
   }
   onLoadChooser() {
     console.log(Dropbox);
+    Dropbox.choose({
+      success: function(files) {
+        console.log(files);
+      },
+      cancel: function() {
+        console.log("cancelled");
+      },
+      linkType: "direct",
+      multiselect: true,
+      extensions: ['.pdf']
+    });
   }
   render() {
     return (
