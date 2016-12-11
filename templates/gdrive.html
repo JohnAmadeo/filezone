@@ -53,6 +53,7 @@
           var picker = new google.picker.PickerBuilder().
               addView(google.picker.ViewId.PDFS).
               enableFeature(google.picker.Feature.NAV_HIDDEN).
+              enableFeature(google.picker.Feature.MULTISELECT_ENABLED).
               setOAuthToken(oauthToken).
               setDeveloperKey(developerKey).
               setCallback(pickerCallback).

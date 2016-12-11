@@ -62,23 +62,6 @@ class Storage extends React.Component {
       'userID': userID
     }
   }
-  onRenameDuplicateFiles(acceptedFiles, error, response) {
-    var newAcceptedFilesData = response.body;
-    var offset = this.state.acceptedFilesData.length;
-    console.log(acceptedFiles);
-
-    var req = Request.post('/upload');
-    req.set('userID', this.state.userID);
-    acceptedFiles.map((file, index) => {
-      req.attach(newAcceptedFilesData[index + offset]['name'], file);
-    });
-    req.end((err, res) => {console.log(res.statusText);});
-
-    this.setState({
-      acceptedFilesData: newAcceptedFilesData
-    })    
-    Store.session.set('acceptedFilesData', newAcceptedFilesData);
-  }
   onDrop(acceptedFiles, rejectedFiles) {  
     {/* Update rejectedFilesData */}
     var newRejectedFilesData = rejectedFiles.map(function(file) {
@@ -101,6 +84,23 @@ class Storage extends React.Component {
           })  
        })
        .end(this.onRenameDuplicateFiles.bind(this, acceptedFiles));
+  }
+  onRenameDuplicateFiles(acceptedFiles, error, response) {
+    var newAcceptedFilesData = response.body;
+    var offset = this.state.acceptedFilesData.length;
+    console.log(acceptedFiles);
+
+    var req = Request.post('/upload');
+    req.set('userID', this.state.userID);
+    acceptedFiles.map((file, index) => {
+      req.attach(newAcceptedFilesData[index + offset]['name'], file);
+    });
+    req.end((err, res) => {console.log(res.statusText);});
+
+    this.setState({
+      acceptedFilesData: newAcceptedFilesData
+    })    
+    Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
   onDelete(fileData, e) {
     e.preventDefault();
