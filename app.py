@@ -89,7 +89,7 @@ def get_unique_name(filename, filename_list):
 
     return filename
 
-@app.route('/download_from_dropbox_and_store', methods=['POST']):
+@app.route('/download_from_dropbox_and_store', methods=['POST'])
 def download_from_dropbox_and_store:
     file_url_list = request.get_json()
     print(file_url_list)
