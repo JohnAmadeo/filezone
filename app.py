@@ -5,6 +5,7 @@ import os
 import json
 import re
 import requests
+import sys
 
 app = Flask(__name__)
 
@@ -93,6 +94,7 @@ def get_unique_name(filename, filename_list):
 def download_from_dropbox_and_store():
     file_url_list = request.get_json()
     print(file_url_list)
+    sys.stdout.flush()
 
 if __name__ == '__main__':
     # app.run(debug=True)
