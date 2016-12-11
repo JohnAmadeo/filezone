@@ -98,6 +98,7 @@ def download_from_dropbox_and_store():
     print(user_id)
     sys.stdout.flush()
     for file_url in file_url_list:
+        print(file_url)
         # local_file_path = download_file(file_url)
         # store_PDF_in_azure(local_file_path, 
         #                    local_file_path.split('/')[-1],
