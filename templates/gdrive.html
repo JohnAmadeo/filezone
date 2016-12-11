@@ -65,6 +65,7 @@
         var url = 'nothing';
         if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
           var doc = data[google.picker.Response.DOCUMENTS][0];
+          console.log(doc);
           url = doc[google.picker.Document.URL];
         }
         var message = 'You picked: ' + url;
