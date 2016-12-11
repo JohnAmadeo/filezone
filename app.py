@@ -15,8 +15,8 @@ BLOCK_BLOB_SERVICE = BlockBlobService(
 
 @app.route('/')
 def hello_world():
-    return render_template('gdrive.html')
-    # return render_template('index.html')    
+    # return render_template('gdrive.html')
+    return render_template('index.html')    
 
 @app.route('/upload', methods=['POST'])
 def upload():

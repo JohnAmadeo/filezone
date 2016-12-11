@@ -20,11 +20,11 @@ body {
 }
 
 /* Picker */
-#app .Picker {
+#app .PickerBar {
   width: 100%;
 }
 
-#app .Picker > .btn {
+#app .PickerBar > .btn {
   width: 33.333%;
   border-radius: 0px;
   margin-left: 0px;

@@ -15,7 +15,7 @@ class Main extends React.Component {
         <Header />
         <Storage />
       </div>
-    )    
+    )
   }
 }
 
@@ -167,7 +167,7 @@ class FailedUploadAlert extends React.Component {
 const UploadBox = (props) => {
   return (
     <div className="UploadBox">
-      <Picker />
+      <PickerBar />
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
           <span> Drag and drop PDFs or click the box to upload </span>
@@ -178,14 +178,91 @@ const UploadBox = (props) => {
 }
 
 {/*Insert onSelect functions*/}
-const Picker = (props) => {
+const PickerBar = (props) => {
   return (
-    <div className="Picker btn-group" role="group" aria-label="...">
+    <div className="PickerBar btn-group" role="group" aria-label="...">
       <button type="button" className="btn btn-default">Computer</button>
       <button type="button" className="btn btn-default">Dropbox</button>
-      <button type="button" className="btn btn-default">Google Drive</button>
+      
+      <GDrivePicker />
     </div>
   )
+}
+
+class GDrivePicker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.onAPILoad = this.onAPILoad.bind(this);  
+    this.onAuthAPILoad = this.onAuthAPILoad.bind(this);  
+    this.onPickerAPILoad = this.onPickerAPILoad.bind(this);  
+    this.handleAuthResult = this.handleAuthResult.bind(this);  
+    this.createPicker = this.createPicker.bind(this);  
+    this.pickerCallback = this.pickerCallback.bind(this);  
+ 
+    this.pickerAPILoaded = false;
+    this.ouathToken = null;
+
+    this.state = {
+      developerKey: 'AIzaSyAy78NbLhvA5SVrEnl1Fzz6ZYoCrlhgbzU',
+      clientId: "343430651263-kncjsdfet1kn51g5toumoiklde3rb4o9.apps.googleusercontent.com",
+      scope: ['https://www.googleapis.com/auth/drive.readonly']
+    }
+  }
+  onAPILoad() { 
+    console.log('onAPILoad Start');
+    gapi.load('auth', {'callback': this.onAuthApiLoad});
+    gapi.load('picker', {'callback': this.onPickerApiLoad});
+    console.log('onAPILoad End');
+  }
+  onAuthAPILoad() {
+    console.log('onAuthAPILoad');
+    window.gapi.auth.authorize(
+        {
+          'client_id': this.state.clientId,
+          'scope': this.state.scope,
+          'immediate': false
+        },
+        this.handleAuthResult
+    );
+  }
+  onPickerAPILoad() {
+    console.log('onPickerAPILoad');
+    this.pickerApiLoaded = true;
+    createPicker();
+  }
+  handleAuthResult(authResult) {
+    if (authResult && !authResult.error) {
+      this.oauthToken = authResult.access_token;
+      createPicker();
+    }
+  }
+  createPicker() {
+    if (this.pickerApiLoaded && this.oauthToken) {
+      var picker = new google.picker.PickerBuilder().
+          addView(google.picker.ViewId.PDFS).
+          enableFeature(google.picker.Feature.NAV_HIDDEN).
+          enableFeature(google.picker.Feature.MULTISELECT_ENABLED).
+          setOAuthToken(this.oauthToken).
+          setDeveloperKey(this.state.developerKey).
+          setCallback(this.pickerCallback).
+          build();
+      picker.setVisible(true);
+    }
+  }
+  pickerCallback(data) {
+    var url = 'nothing';
+    if (data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+      var doc = data[google.picker.Response.DOCUMENTS][0];
+      console.log(doc);
+      url = doc[google.picker.Document.URL];
+    }
+    console.log('You picked: ' + url);
+  }
+  render() {
+    return (
+      <button type="button" className="btn btn-default" onClick={this.onAPILoad}>Google Drive</button>
+    )
+  }
 }
 
 const FileList = (props) => {
