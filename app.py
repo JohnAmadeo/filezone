@@ -105,10 +105,15 @@ def get_unique_name(filename, filename_list):
 def download_from_dropbox_and_store():
     print('before file_url_list')
     file_url_list = (request.get_json())['fileUrlList']
+    print(file_url_list)
+
     print('before filename_list')
     filename_list = (request.get_json())['filenameList']
+    print(filename_list)
+
     print('before user_id')
     user_id = request.headers['userID']
+    print(user_id)
 
     for index, file_url in enumerate(file_url_list):
         print('before local_file_path')
