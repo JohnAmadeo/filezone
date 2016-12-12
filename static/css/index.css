@@ -2,14 +2,24 @@ body {
   padding-top: 100px;
 }
 
+#app {
+  font-family: 'Source Sans Pro', 'Helvetica';
+}
+
 /* Header */
 #app .navbar {
-  border: 1px solid black;
+  /*border: 1px solid black;*/
+  background-color: #4CCEAD;
+  border-bottom: 2px solid #32B594;
 }
 
 #app .Header .navbar-brand {
   margin-left: 10px;
-  font-size: 25px;
+  font-size: 30px;
+  color: #FFFFFF;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 /* Storage */
@@ -17,6 +27,10 @@ body {
   #app .Storage {
     max-width: 800px;
   }
+}
+
+#app .Storage {
+  margin-top: 20px;
 }
 
 /* Picker */
@@ -35,16 +49,29 @@ body {
 #app .PickerBar > .btn {
   width: 50%;
   border-radius: 0px;
+  border: 2px solid #FFFFFF;
   margin-left: 0px;
+  background-color: #3366CC;
+  color: #FFFFFF;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+#app .PickerBar > .btn:hover, .btn:focus {
+  color: #3366CC;
+  background-color: #FFFFFF;
+  border: 2px solid #3366CC;
 }
 
 #app .ComputerPicker input {
   display: none;
+  border-right: 0px;
 }
 
 /* Dropzone */
 #app .Dropzone {
-  border: 1px dashed black;
+  border: 2px dashed #3366CC;
   /*border-top: 0px;*/
   height: 250px;
 }
@@ -58,6 +85,7 @@ body {
 #app .Dropzone span {
   display: inline-block;;
   vertical-align: middle;
+  color: #3366CC;
 }
 
 /* FileList */
@@ -71,6 +99,7 @@ body {
 }
 
 #app .FileList th, td {
+  color: #3366CC;
   font-size: 14px;
   font-weight: normal;
   overflow: hidden;
@@ -80,16 +109,23 @@ body {
 
 #app .FileList .size {
   width: 100px;
+  color: #4CCEAD;
+}
+
+#app .FileList a:visited {
+  text-decoration: none;
 }
 
 #app .FileList .delete-cross {
   width: 55px;
   font-size: 22px;
   padding-top: 0px;
+  color: red;
 }
 
 #app .FileList .delete-cross a {
   cursor: pointer;
+  color: red;
 }
 
 #app .FileList th:nth-child(1) {
