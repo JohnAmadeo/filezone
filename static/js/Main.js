@@ -209,7 +209,7 @@ class FailedUploadAlert extends React.Component {
 const UploadBox = (props) => {
   return (
     <div className="UploadBox">
-      <PickerBar userID={props.userID} onLoadChooser={props.onLoadChooser}/>
+      <PickerBar onLoadDrop={props.onDrop} onLoadChooser={props.onLoadChooser}/>
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
           <span> Drag and drop PDFs or click the box to upload </span>
@@ -223,9 +223,16 @@ const UploadBox = (props) => {
 const PickerBar = (props) => {
   return (
     <div className="PickerBar btn-group" role="group" aria-label="...">
+      <ComputerPicker onLoadDrop={props.onLoadDrop}/>
       <button type="button" className="btn btn-default">Computer</button>
-      <DropboxPicker userID={props.userID} onLoadChooser={props.onLoadChooser}/>
+      <DropboxPicker onLoadChooser={props.onLoadChooser}/>
     </div>
+  )
+}
+
+const ComputerPicker = (props) => {
+  return (
+    <button type="button" className="btn btn-default" onClick={props.onLoadDrop}>Computer</button>
   )
 }
 
