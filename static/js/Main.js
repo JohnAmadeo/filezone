@@ -127,7 +127,7 @@ class Storage extends React.Component {
     }
     else if('bytes' in acceptedFiles[0]) {
       var req = Request.post('/download_from_dropbox_and_store');
-      req.set('userID', this.props.userID)
+      req.set('userID', this.state.userID)
          .set('Content-Type', 'application/json')
          .send({
             'fileUrlList': fileUrlList,
