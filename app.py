@@ -104,10 +104,8 @@ def get_unique_name(filename, filename_list):
 @app.route('/download_from_dropbox_and_store', methods=['POST'])
 def download_from_dropbox_and_store():
     print('before file_url_list')
-    print(file_url_list)
     file_url_list = (request.get_json())['fileUrlList']
     print('before filename_list')
-    print(filename_list)
     filename_list = (request.get_json())['filenameList']
     print('before user_id')
     user_id = request.headers['userID']
