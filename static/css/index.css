@@ -67,7 +67,7 @@ body {
 }
 
 #app .FileList .size {
-  width: 80px;
+  width: 100px;
 }
 
 #app .FileList .delete-cross {
