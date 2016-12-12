@@ -38,7 +38,7 @@ class Storage extends React.Component {
     this.onDrop = this.onDrop.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.onLoadChooser = this.onLoadChooser.bind(this);
-    this.onTest = this.onTest.bind(this);
+    this.onLoadLocal = this.onLoadLocal.bind(this);
 
     this.renameDuplicateFiles = this.renameDuplicateFiles.bind(this);
     this.storeFileData = this.storeFileData.bind(this);
@@ -68,7 +68,7 @@ class Storage extends React.Component {
       'userID': userID
     }
   }
-  onTest(e) {
+  onLoadLocal(e) {
     var nonMappableFileList = e.target.files;
     var files = [];
     for(let file of nonMappableFileList) {
@@ -114,13 +114,15 @@ class Storage extends React.Component {
             }
           })  
        })
-       .end(this.storeFileData.bind(this, acceptedFiles));
+       .end(this.storeFileToAzure.bind(this, acceptedFiles));
+       {/*.end(this.storeFileData.bind(this, acceptedFiles));*/}
   }
   storeFileData(acceptedFiles, error, response) {
     this.storeFileToAzure(acceptedFiles, response);  
-    this.storeFileDataToState(response);
+    {/*this.storeFileDataToState(response);*/}
   }
-  storeFileToAzure(acceptedFiles, response) {
+  storeFileToAzure(acceptedFiles, error, response) {
+    console.log('response 1');
     console.log(response);
     var oldLength = this.state.acceptedFilesData.length;
     var newLength = response.body.length;
@@ -134,7 +136,8 @@ class Storage extends React.Component {
       acceptedFiles.map((file, index) => {
         req.attach(filenameList[index], file);
       });
-      req.end((err, res) => {console.log(res.statusText);});
+      {/*req.end((err, res) => {console.log(res.statusText);});*/}
+      req.end(this.storeFileDataToState.bind(this, response.body));
     }
     else if('bytes' in acceptedFiles[0]) {
       var req = Request.post('/download_from_dropbox_and_store');
@@ -144,11 +147,11 @@ class Storage extends React.Component {
             'fileUrlList': fileUrlList,
             'filenameList': filenameList
          })
-         .end((err, res) => {console.log(res.statusText);})      
+         .end(this.storeFileDataToState.bind(this, response.body));
+         {/*.end((err, res) => {console.log(res.statusText);})*/}   
     }
   }
-  storeFileDataToState(response) {
-    var newAcceptedFilesData = response.body;
+  storeFileDataToState(newAcceptedFilesData, error, response) {
     this.setState({
       acceptedFilesData: newAcceptedFilesData
     })    
@@ -178,7 +181,7 @@ class Storage extends React.Component {
         <FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>
         <UploadBox onDrop={this.onDrop} userID={this.state.userID}
                    onLoadChooser={this.onLoadChooser}
-                   onTest={this.onTest}/>
+                   onLoadLocal={this.onLoadLocal}/>
         <FileList acceptedFilesData={this.state.acceptedFilesData} 
                   userID={this.state.userID} 
                   onDelete={this.onDelete}/>
@@ -221,7 +224,7 @@ class FailedUploadAlert extends React.Component {
 const UploadBox = (props) => {
   return (
     <div className="UploadBox">
-      <PickerBar onTest={props.onTest} onLoadChooser={props.onLoadChooser}/>
+      <PickerBar onLoadLocal={props.onLoadLocal} onLoadChooser={props.onLoadChooser}/>
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
           <span> Drag and drop PDFs or click the box to upload </span>
@@ -235,7 +238,7 @@ const UploadBox = (props) => {
 const PickerBar = (props) => {
   return (
     <div className="PickerBar btn-group" role="group" aria-label="...">
-      <ComputerPicker onTest={props.onTest}/>
+      <ComputerPicker onLoadLocal={props.onLoadLocal}/>
       <DropboxPicker onLoadChooser={props.onLoadChooser}/>
     </div>
   )
@@ -244,7 +247,7 @@ const PickerBar = (props) => {
 const ComputerPicker = (props) => {
   return (
     <label className="ComputerPicker btn btn-default btn-file">
-        Computer <input type="file" onChange={props.onTest} accept=".pdf" multiple/>
+        Computer <input type="file" onChange={props.onLoadLocal} accept=".pdf" multiple/>
     </label>
   )
 }
