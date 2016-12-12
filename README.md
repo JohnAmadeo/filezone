@@ -1,5 +1,6 @@
 # FileZone
 Online PDF viewer web app that allows users to view PDFs uploaded from local folders or a Dropbox account. 
+Try it out at https://filezone.herokuapp.com/
 
 ## Documentation/Explanation of Features
 
