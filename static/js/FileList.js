@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom'
 
 const FileList = (props) => {
+  {/* Show a list of files that the user has uploaded */}
   return (
     <div className="FileList table-responsive">
       <table className="table">

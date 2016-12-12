@@ -45,8 +45,6 @@ class Storage extends React.Component {
     this.storeFileToAzure = this.storeFileToAzure.bind(this);
     this.storeFileDataToState = this.storeFileDataToState.bind(this);    
 
-    {/* Retrieve state values from previous sessions stored
-        on localStorage using store.js library */}
     var localPersistentState = this.getLocalPersistentState();
 
     this.state = {
@@ -56,6 +54,8 @@ class Storage extends React.Component {
     }
   }
   getLocalPersistentState() {
+    {/* Retrieve state values from previous sessions stored
+        on localStorage using store.js library */}
     var acceptedFilesData = Store.session.get('acceptedFilesData') ? 
                             Store.session.get('acceptedFilesData') : [];
 
@@ -69,6 +69,8 @@ class Storage extends React.Component {
     }
   }
   onLoadLocal(e) {
+    {/* Load files from local folders after the 'Computer' button 
+        is clicked */}
     var nonMappableFileList = e.target.files;
     var files = [];
     for(let file of nonMappableFileList) {
@@ -79,7 +81,10 @@ class Storage extends React.Component {
     }
   }
   onDrop(acceptedFiles, rejectedFiles) {  
-    {/* Update rejectedFilesData */}
+    {/* Trigerred following drag-n-drop of files into the dropzone */}
+
+    {/* Update rejectedFilesData so user can be shown the 
+        dismissable aler component, <FailedUploadAlert /> */}
     var newRejectedFilesData = rejectedFiles.map(function(file) {
       return {'name': file.name}
     })
@@ -87,10 +92,13 @@ class Storage extends React.Component {
       rejectedFilesData: newRejectedFilesData
     });
 
-    {/* Update acceptedFilesData */}
+    {/* Update acceptedFilesData so user can be given ability
+        to view and open newly uploaded files in <FileList /> */}
     this.renameDuplicateFiles(acceptedFiles);
   }
   onLoadChooser() {
+    {/* Create Dropbox Chooser to allow upload of files in a 
+        Dropbox account */}
     Dropbox.choose({
       success: this.renameDuplicateFiles,
       cancel: function() {console.log("No files uploaded");},
@@ -100,7 +108,8 @@ class Storage extends React.Component {
     });
   }
   renameDuplicateFiles(acceptedFiles) {
-
+    {/* Resolve all potential naming collisions between uploaded
+        files and files the user wants to upload */}
     var req = Request.post('/rename_duplicates');
     req.set('Content-Type', 'application/json')
        .send({
@@ -115,9 +124,12 @@ class Storage extends React.Component {
           })  
        })
        .end(this.storeFileToAzure.bind(this, acceptedFiles));
-       {/*.end(this.storeFileData.bind(this, acceptedFiles));*/}
   }
   storeFileToAzure(acceptedFiles, error, response) {
+    {/* Store file in Azure to allow user to click on link in
+        the <FileList /> component and be brought to a PDF viewer. 
+        Depending on method of upload, (local vs Dropbox), different 
+        calls are made to the back-end to perform the file storage */}
     var oldLength = this.state.acceptedFilesData.length;
     var newLength = response.body.length;
     var filenameList = response.body.map((file) => file.name);
@@ -130,7 +142,6 @@ class Storage extends React.Component {
       acceptedFiles.map((file, index) => {
         req.attach(filenameList[index], file);
       });
-      {/*req.end((err, res) => {console.log(res.statusText);});*/}
       req.end(this.storeFileDataToState.bind(this, response.body));
     }
     else if('bytes' in acceptedFiles[0]) {
@@ -142,16 +153,19 @@ class Storage extends React.Component {
             'filenameList': filenameList
          })
          .end(this.storeFileDataToState.bind(this, response.body));
-         {/*.end((err, res) => {console.log(res.statusText);})*/}   
     }
   }
   storeFileDataToState(newAcceptedFilesData, error, response) {
+    {/* Update the list of files that have been uploaded to keep 
+        files listed in <FilesList> current and accurate */}
     this.setState({
       acceptedFilesData: newAcceptedFilesData
     })    
     Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
   onDelete(fileData, e) {
+    {/* Delete a file, removing both the file itself on Azure and the
+        entry visible in <FileList /> */}
     e.preventDefault();
     var fileIndex = this.state.acceptedFilesData.indexOf(fileData);
 
@@ -195,6 +209,9 @@ class FailedUploadAlert extends React.Component {
     super(props);
   }
   render() {
+    {/* Show user a dismissable error alert if user attempted
+        to upload non-PDF files; Show nothing otherwise */}
+
     var rejectedFilesData = this.props.rejectedFilesData;
     var rejectedFilenames = rejectedFilesData.map((fileData) => fileData.name);
     if(rejectedFilesData && rejectedFilesData.length > 0) {

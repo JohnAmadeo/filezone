@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom'
 import Dropzone from 'react-dropzone';
 
 const UploadBox = (props) => {
+  {/* Allows user to upload PDFs via drag-and-drop, clicking the 'Computer' button,
+      to upload from local folders, or the 'Dropbox' button to bring up the 
+      Dropbox Chooser */}
   return (
     <div className="UploadBox">
       <PickerBar onLoadLocal={props.onLoadLocal} onLoadChooser={props.onLoadChooser}/>
@@ -15,7 +18,6 @@ const UploadBox = (props) => {
   )
 }
 
-{/*Insert onSelect functions*/}
 const PickerBar = (props) => {
   return (
     <div className="PickerBar btn-group" role="group" aria-label="...">
