@@ -49,18 +49,22 @@ body {
 #app .PickerBar > .btn {
   width: 50%;
   border-radius: 0px;
-  border: 2px solid #FFFFFF;
+  border: 2px solid #3366CC;
   margin-left: 0px;
-  background-color: #3366CC;
-  color: #FFFFFF;
+  background-color: #FFFFFF;
+  color: #3366CC;
   font-weight: bold;
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
+#app .PickerBar > .ComputerPicker {
+  border-right: 0px;
+}
+
 #app .PickerBar > .btn:hover, .btn:focus {
-  color: #3366CC;
-  background-color: #FFFFFF;
+  color: #FFFFFF;
+  background-color: #3366CC;
   border: 2px solid #3366CC;
 }
 

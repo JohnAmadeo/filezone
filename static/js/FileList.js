@@ -30,7 +30,7 @@ class File extends React.Component {
   }
   render() {
     var viewerUrl = "https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=";
-    var userPath = "../pdf/" + this.props.userID + "/" + this.props.fileData.name;
+    var userPath = "../pdf/" + this.props.userID + "/" + encodeURIComponent(this.props.fileData.name);
     return (
       <tr>
         <td>
