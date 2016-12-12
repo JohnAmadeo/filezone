@@ -22,6 +22,14 @@ body {
 /* Picker */
 #app .PickerBar {
   width: 100%;
+  display: none;
+}
+
+@media (min-width: 479px) {
+  #app .PickerBar {
+    width: 100%;
+    display: initial;
+  }
 }
 
 #app .PickerBar > .btn {

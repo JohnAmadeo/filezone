@@ -38,6 +38,7 @@ class Storage extends React.Component {
     this.onDrop = this.onDrop.bind(this);
     this.onDelete = this.onDelete.bind(this);
     this.onLoadChooser = this.onLoadChooser.bind(this);
+    this.onTest = this.onTest.bind(this);
 
     this.renameDuplicateFiles = this.renameDuplicateFiles.bind(this);
     this.storeFileData = this.storeFileData.bind(this);
@@ -65,6 +66,16 @@ class Storage extends React.Component {
     return {
       'acceptedFilesData': acceptedFilesData,
       'userID': userID
+    }
+  }
+  onTest(e) {
+    var nonMappableFileList = e.target.files;
+    var files = [];
+    for(let file of nonMappableFileList) {
+      files.push(file);
+    }
+    if(files) {
+      this.renameDuplicateFiles(files);
     }
   }
   onDrop(acceptedFiles, rejectedFiles) {  
@@ -166,7 +177,8 @@ class Storage extends React.Component {
       <div className="Storage container">
         <FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>
         <UploadBox onDrop={this.onDrop} userID={this.state.userID}
-                   onLoadChooser={this.onLoadChooser}/>
+                   onLoadChooser={this.onLoadChooser}
+                   onTest={this.onTest}/>
         <FileList acceptedFilesData={this.state.acceptedFilesData} 
                   userID={this.state.userID} 
                   onDelete={this.onDelete}/>
@@ -209,7 +221,7 @@ class FailedUploadAlert extends React.Component {
 const UploadBox = (props) => {
   return (
     <div className="UploadBox">
-      <PickerBar onLoadDrop={props.onDrop} onLoadChooser={props.onLoadChooser}/>
+      <PickerBar onTest={props.onTest} onLoadChooser={props.onLoadChooser}/>
       <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
         <div> 
           <span> Drag and drop PDFs or click the box to upload </span>
@@ -223,7 +235,7 @@ const UploadBox = (props) => {
 const PickerBar = (props) => {
   return (
     <div className="PickerBar btn-group" role="group" aria-label="...">
-      <ComputerPicker onLoadDrop={props.onLoadDrop}/>
+      <ComputerPicker onTest={props.onTest}/>
       <DropboxPicker onLoadChooser={props.onLoadChooser}/>
     </div>
   )
@@ -232,7 +244,7 @@ const PickerBar = (props) => {
 const ComputerPicker = (props) => {
   return (
     <label className="ComputerPicker btn btn-default btn-file">
-        Browse <input type="file"/>
+        Computer <input type="file" onChange={props.onTest} accept=".pdf" multiple/>
     </label>
   )
 }
