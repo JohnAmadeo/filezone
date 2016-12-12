@@ -1,9 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom'
-import Dropzone from 'react-dropzone';
 import Request from 'superagent';
 import UUID from 'uuid/v4';
 import Store from 'store2';
+import FileList from './FileList';
+import UploadBox from './UploadBox';
 
 class Main extends React.Component {
   constructor(props) {
@@ -41,7 +42,6 @@ class Storage extends React.Component {
     this.onLoadLocal = this.onLoadLocal.bind(this);
 
     this.renameDuplicateFiles = this.renameDuplicateFiles.bind(this);
-    this.storeFileData = this.storeFileData.bind(this);
     this.storeFileToAzure = this.storeFileToAzure.bind(this);
     this.storeFileDataToState = this.storeFileDataToState.bind(this);    
 
@@ -117,13 +117,7 @@ class Storage extends React.Component {
        .end(this.storeFileToAzure.bind(this, acceptedFiles));
        {/*.end(this.storeFileData.bind(this, acceptedFiles));*/}
   }
-  storeFileData(acceptedFiles, error, response) {
-    this.storeFileToAzure(acceptedFiles, response);  
-    {/*this.storeFileDataToState(response);*/}
-  }
   storeFileToAzure(acceptedFiles, error, response) {
-    console.log('response 1');
-    console.log(response);
     var oldLength = this.state.acceptedFilesData.length;
     var newLength = response.body.length;
     var filenameList = response.body.map((file) => file.name);
@@ -164,7 +158,7 @@ class Storage extends React.Component {
     {/* Request back-end to delete file from Azure via POST*/}
     var req = Request.post('/delete');
     req.set('userID', this.state.userID)
-       .send({userID: this.state.acceptedFilesData[fileIndex].name})
+       .send({filename: this.state.acceptedFilesData[fileIndex].name})
        .end((err, res) => {console.log(res.statusText);});
 
     var newAcceptedFilesData = 
@@ -221,89 +215,4 @@ class FailedUploadAlert extends React.Component {
   }
 }
 
-const UploadBox = (props) => {
-  return (
-    <div className="UploadBox">
-      <PickerBar onLoadLocal={props.onLoadLocal} onLoadChooser={props.onLoadChooser}/>
-      <Dropzone className="Dropzone" accept='application/pdf' onDrop={props.onDrop}>
-        <div> 
-          <span> Drag and drop PDFs or click the box to upload </span>
-        </div>
-      </Dropzone>  
-    </div>
-  )
-}
-
-{/*Insert onSelect functions*/}
-const PickerBar = (props) => {
-  return (
-    <div className="PickerBar btn-group" role="group" aria-label="...">
-      <ComputerPicker onLoadLocal={props.onLoadLocal}/>
-      <DropboxPicker onLoadChooser={props.onLoadChooser}/>
-    </div>
-  )
-}
-
-const ComputerPicker = (props) => {
-  return (
-    <label className="ComputerPicker btn btn-default btn-file">
-        Computer <input type="file" onChange={props.onLoadLocal} accept=".pdf" multiple/>
-    </label>
-  )
-}
-
-const DropboxPicker = (props) => {
-  return (
-    <button type="button" className="btn btn-default" onClick={props.onLoadChooser}>Dropbox</button>
-  )
-}
-
-const FileList = (props) => {
-  return (
-    <div className="FileList table-responsive">
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th className="size">Size</th>
-            <th className="delete-cross"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {props.acceptedFilesData.map((fileData, index) => (
-            <File fileData={fileData} userID={props.userID} 
-                  key={index} onDelete={props.onDelete}/>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-class File extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    var viewerUrl = "https://filezone.blob.core.windows.net/filezone-static/web/viewer.html?file=";
-    var userPath = "../pdf/" + this.props.userID + "/" + this.props.fileData.name;
-    return (
-      <tr>
-        <td>
-          <a target="_blank" href={viewerUrl + userPath}>
-            {this.props.fileData.name}
-          </a>
-        </td>
-        <td className="size">{this.props.fileData.size} MB</td>
-        <td className="delete-cross">
-          <a target="#" onClick={this.props.onDelete.bind(this, this.props.fileData)}> 
-            &times; 
-          </a>
-        </td>
-      </tr>
-    )
-  }
-}
-
 module.exports = Main;
-

@@ -21,9 +21,18 @@ def serve_index():
     return render_template('index.html')    
 
 
-
 @app.route('/upload', methods=['POST'])
 def upload():
+    """
+    Uploads files received to Azure inside the folder
+
+    Structure of Request Received:
+    Header: 
+        userid: user ID to which file belongs to 
+    Body:
+        files: PDF files to be uploaded to Azure
+
+    """
     user_id = request.headers['userid']
     pdf_dictionary = request.files
     pdf_filenames = pdf_dictionary.keys()
@@ -37,6 +46,13 @@ def upload():
     return make_response()
 
 def store_PDF_in_azure(local_path_to_file, filename, user_id):
+    """
+    Uploads a file to Azure
+    Args:
+    local_path_to_file: local path to file to be uploaded
+    filename: desired name of file on Azure once uploaded
+    user_id: specifies folder file should be uploaded to
+    """
     print('Uploading ' + filename)
     BLOCK_BLOB_SERVICE.create_blob_from_path(
         container_name='filezone-static',
@@ -50,13 +66,28 @@ def store_PDF_in_azure(local_path_to_file, filename, user_id):
 
 @app.route('/delete', methods=['POST'])
 def delete():
-    filename = json.loads(request.data.decode('utf-8'))['userID']
+    """
+    Deletes a file from Azure
+
+    Structure of Request Received:
+    Headers:
+        userid: user ID to which file belongs to
+    Body:
+        filename: name of file to be deleted
+    """
+    filename = json.loads(request.data.decode('utf-8'))['filename']
     user_id = request.headers['userid']
     remove_PDF_from_azure(filename, user_id)
 
     return make_response()
 
 def remove_PDF_from_azure(filename, user_id):
+    """
+    Deletes a file from Azure
+    Args:
+    filename: name of file to be deleted
+    user_id: name of folder where file can be found
+    """
     print('Deleting ' + filename)
     BLOCK_BLOB_SERVICE.delete_blob(
         container_name='filezone-static',
@@ -68,6 +99,27 @@ def remove_PDF_from_azure(filename, user_id):
 
 @app.route('/rename_duplicates', methods=['POST'])
 def rename_duplicates():
+    """
+    Given an array of filenames already in the user's 
+    Azure folder, and an array of filenames that the user
+    wants to add to his/her folder, resolves naming collisions
+    by appending the suffix ([NUMBER]) after the original name
+    and before the extension (e.g file.pdf -> file(1).pdf; file(2).pdf -> file(3).pdf)
+    such that no PDF will be rejected for upload AND each PDF has a 
+    unique filename. Returns a single array of unique filenames 
+    for both files already in and to be uploaded to Azure.
+
+    Structure of Request Received:
+    Body:
+        filesData: an array of filenames already in the user's 
+        Azure folder
+        newFilesData: an array of filenames that the user
+        wants to add to his/her folder
+
+    Structure of Response Returned
+    Body: A single array of unique filenames for all files - including
+    files already in Azure and files to be uploaded
+    """
     file_data_list = (request.get_json())['filesData']
     new_file_data_list = (request.get_json())['newFilesData']
 
@@ -83,7 +135,17 @@ def rename_duplicates():
                     status=200, 
                     mimetype='application/json')
 
+
 def get_unique_name(filename, filename_list):
+    """
+    Return a unique filename such that the filename
+    has not yet been taken in filename_list
+    Args:
+        filename: filename is changed if existing file in filename_list;
+        no change other
+        filename_list: list of files the filename arg must not match
+    Returns a unique filename
+    """
     while filename in filename_list:
         number_id_substring_list = re.findall(r"\([0-9]+\)\.pdf", filename)
         if number_id_substring_list:
@@ -103,6 +165,18 @@ def get_unique_name(filename, filename_list):
 
 @app.route('/download_from_dropbox_and_store', methods=['POST'])
 def download_from_dropbox_and_store():
+    """
+    Downloads all files from URLs specified, saves them 
+    temporarily and uploads them to Azure with names speicfied
+    in the filenames list
+
+    Structure of Request Received:
+    fileUrlList: array of URLs to PDFs stored on a Dropbox account
+    that are to be downloaded
+    filenameList: array of names that the files downloaded off
+    Dropbox should be saved as on Azure (file name provided may
+    not be equivalent to current name on Dropbox due to collisions)
+    """
     print('before file_url_list')
     file_url_list = (request.get_json())['fileUrlList']
     print(file_url_list)
@@ -128,6 +202,10 @@ def download_from_dropbox_and_store():
                     mimetype='application/json')
 
 def download_file(url):
+    """
+    Downloads file from Dropbox URL in chunks and
+    saves file onto temporary folder on local/Heroku filesystem
+    """
     local_file_path = '/tmp/' + url.split('/')[-1]
     # NOTE the stream=True parameter
     r = requests.get(url, stream=True)
