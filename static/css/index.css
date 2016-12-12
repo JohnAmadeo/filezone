@@ -30,6 +30,10 @@ body {
   margin-left: 0px;
 }
 
+#app .ComputerPicker input {
+  display: none;
+}
+
 /* Dropzone */
 #app .Dropzone {
   border: 1px dashed black;
@@ -83,3 +87,4 @@ body {
 #app .FileList th:nth-child(1) {
   text-align: left;
 }
+

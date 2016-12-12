@@ -224,7 +224,6 @@ const PickerBar = (props) => {
   return (
     <div className="PickerBar btn-group" role="group" aria-label="...">
       <ComputerPicker onLoadDrop={props.onLoadDrop}/>
-      <button type="button" className="btn btn-default">Computer</button>
       <DropboxPicker onLoadChooser={props.onLoadChooser}/>
     </div>
   )
@@ -232,7 +231,9 @@ const PickerBar = (props) => {
 
 const ComputerPicker = (props) => {
   return (
-    <button type="button" className="btn btn-default" onClick={props.onLoadDrop}>Computer</button>
+    <label className="ComputerPicker btn btn-default btn-file">
+        Browse <input type="file"/>
+    </label>
   )
 }
 
