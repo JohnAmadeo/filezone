@@ -135,7 +135,6 @@ def rename_duplicates():
                     status=200, 
                     mimetype='application/json')
 
-
 def get_unique_name(filename, filename_list):
     """
     Return a unique filename such that the filename

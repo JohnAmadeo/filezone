@@ -50,7 +50,8 @@ class Storage extends React.Component {
     this.state = {
       acceptedFilesData: localPersistentState.acceptedFilesData,
       rejectedFilesData: [],
-      userID: localPersistentState.userID
+      userID: localPersistentState.userID,
+      isUploading: false
     }
   }
   getLocalPersistentState() {
@@ -82,14 +83,14 @@ class Storage extends React.Component {
   }
   onDrop(acceptedFiles, rejectedFiles) {  
     {/* Trigerred following drag-n-drop of files into the dropzone */}
-
     {/* Update rejectedFilesData so user can be shown the 
         dismissable aler component, <FailedUploadAlert /> */}
     var newRejectedFilesData = rejectedFiles.map(function(file) {
       return {'name': file.name}
     })
     this.setState({
-      rejectedFilesData: newRejectedFilesData
+      rejectedFilesData: newRejectedFilesData,
+      isUploading: acceptedFiles.length === 0 ? false : true
     });
 
     {/* Update acceptedFilesData so user can be given ability
@@ -159,7 +160,8 @@ class Storage extends React.Component {
     {/* Update the list of files that have been uploaded to keep 
         files listed in <FilesList> current and accurate */}
     this.setState({
-      acceptedFilesData: newAcceptedFilesData
+      acceptedFilesData: newAcceptedFilesData,
+      isUploading: false
     })    
     Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
@@ -186,10 +188,11 @@ class Storage extends React.Component {
   render() {
     return (
       <div className="Storage container">
-        <FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>
+        {/*<FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>*/}
         <UploadBox onDrop={this.onDrop} userID={this.state.userID}
                    onLoadChooser={this.onLoadChooser}
                    onLoadLocal={this.onLoadLocal}/>
+        <LoadingAlert isUploading={this.state.isUploading}/>
         <FileList acceptedFilesData={this.state.acceptedFilesData} 
                   userID={this.state.userID} 
                   onDelete={this.onDelete}/>
@@ -203,6 +206,25 @@ Storage.propTypes = {
   rejectedFilesData: React.PropTypes.arrayOf(React.PropTypes.object),
   userID: React.PropTypes.string
 }
+
+class LoadingAlert extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    if(this.props.isUploading === true) {
+      return (
+        <div className="LoadingAlert"> 
+          Uploading files... 
+        </div>
+      )      
+    }
+    else {
+      return null;
+    }
+  }
+}
+
 
 class FailedUploadAlert extends React.Component {
   constructor(props) {
