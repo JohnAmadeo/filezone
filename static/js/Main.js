@@ -73,13 +73,30 @@ class Storage extends React.Component {
     {/* Load files from local folders after the 'Computer' button 
         is clicked */}
     var nonMappableFileList = e.target.files;
-    var files = [];
+    var acceptedFiles = [];
+    var rejectedFilesData = [];
     for(let file of nonMappableFileList) {
-      files.push(file);
+      if(file.type === "application/pdf") {
+        acceptedFiles.push(file); 
+      }
+      else {
+        rejectedFilesData.push({'name': file.name});
+      }
     }
-    if(files) {
-      this.renameDuplicateFiles(files);
+
+    console.log(rejectedFilesData);
+
+    this.setState({
+      rejectedFilesData: rejectedFilesData,
+      isUploading: acceptedFiles.length === 0 ? false : true
+    })
+
+
+    if(acceptedFiles) {
+      this.renameDuplicateFiles(acceptedFiles);
     }
+
+    console.log(acceptedFiles);
   }
   onDrop(acceptedFiles, rejectedFiles) {  
     {/* Trigerred following drag-n-drop of files into the dropzone */}
@@ -188,7 +205,7 @@ class Storage extends React.Component {
   render() {
     return (
       <div className="Storage container">
-        {/*<FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>*/}
+        <FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>
         <UploadBox onDrop={this.onDrop} userID={this.state.userID}
                    onLoadChooser={this.onLoadChooser}
                    onLoadLocal={this.onLoadLocal}/>
