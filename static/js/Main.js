@@ -41,6 +41,7 @@ class Storage extends React.Component {
     this.onLoadChooser = this.onLoadChooser.bind(this);
     this.onLoadLocal = this.onLoadLocal.bind(this);
 
+    this.showAlertAndRenameFiles = this.showAlertAndRenameFiles.bind(this);
     this.renameDuplicateFiles = this.renameDuplicateFiles.bind(this);
     this.storeFileToAzure = this.storeFileToAzure.bind(this);
     this.storeFileDataToState = this.storeFileDataToState.bind(this);    
@@ -118,12 +119,18 @@ class Storage extends React.Component {
     {/* Create Dropbox Chooser to allow upload of files in a 
         Dropbox account */}
     Dropbox.choose({
-      success: this.renameDuplicateFiles,
+      success: this.showAlertAndRenameFiles,
       cancel: function() {console.log("No files uploaded");},
       linkType: "direct",
       multiselect: true,
       extensions: ['.pdf']
     });
+  }
+  showAlertAndRenameFiles(acceptedFiles) {
+    this.setState({
+      isUploading: true
+    })
+    this.renameDuplicateFiles(acceptedFiles);
   }
   renameDuplicateFiles(acceptedFiles) {
     {/* Resolve all potential naming collisions between uploaded
