@@ -15,12 +15,20 @@ body {
 }
 
 #app .Header .navbar-brand {
-  margin-left: 10px;
-  font-size: 30px;
-  color: #FFFFFF;
-  font-weight: bold;
   margin-top: 10px;
   margin-bottom: 10px;
+  margin-left: -10px;
+  font-size: 24px;
+  color: #FFFFFF;
+}
+
+#app .Header .logo {
+  padding: 5px;
+  padding-left: 30px;
+}
+
+#app .Header .navbar-brand img {
+  width:30px;
 }
 
 /* Storage */
@@ -28,10 +36,6 @@ body {
   #app .Storage {
     max-width: 800px;
   }
-}
-
-#app .Storage {
-  margin-top: 20px;
 }
 
 /* Picker */
@@ -121,6 +125,10 @@ body {
   overflow: hidden;
   white-space: nowrap; 
   text-overflow: ellipsis;
+}
+
+#app .FileList a {
+  color: #3366CC;
 }
 
 #app .FileList .size {

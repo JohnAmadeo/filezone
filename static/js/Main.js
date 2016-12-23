@@ -25,6 +25,9 @@ const Header = (props) => {
     <div className='Header'>
       <nav className="navbar navbar-fixed-top">
           <div className="navbar-header">
+            <a className="navbar-brand logo" href="#">
+              <img alt="" src="../static/icon.png"/>
+            </a>
             <a className="navbar-brand" href="#">FileZone</a>
           </div>
       </nav>
