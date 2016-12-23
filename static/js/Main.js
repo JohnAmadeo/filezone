@@ -157,27 +157,30 @@ class Storage extends React.Component {
         calls are made to the back-end to perform the file storage */}
     var oldLength = this.state.acceptedFilesData.length;
     var newLength = response.body.length;
-    var filenameList = response.body.map((file) => file.name);
+    var filenameList = response.body.filesData.map((file) => file.name);
     filenameList = filenameList.slice(oldLength, newLength);
     var fileUrlList = acceptedFiles.map((file) => file.link);
 
+    {/* 'size'  => user files are on local folders
+        'bytes' => user files are on Dropbox */}
     if('size' in acceptedFiles[0]) {
       var req = Request.post('/upload');
-      req.set('userID', this.state.userID);
+      req.set('UserID', this.state.userID)
+         .set('Content-Disposition', 'attachment');
       acceptedFiles.map((file, index) => {
         req.attach(filenameList[index], file);
       });
-      req.end(this.storeFileDataToState.bind(this, response.body));
+      req.end(this.storeFileDataToState.bind(this, response.body.filesData));
     }
     else if('bytes' in acceptedFiles[0]) {
       var req = Request.post('/download_from_dropbox_and_store');
-      req.set('userID', this.state.userID)
+      req.set('UserID', this.state.userID)
          .set('Content-Type', 'application/json')
          .send({
             'fileUrlList': fileUrlList,
             'filenameList': filenameList
          })
-         .end(this.storeFileDataToState.bind(this, response.body));
+         .end(this.storeFileDataToState.bind(this, response.body.filesData));
     }
   }
   storeFileDataToState(newAcceptedFilesData, error, response) {
@@ -197,8 +200,9 @@ class Storage extends React.Component {
 
     {/* Request back-end to delete file from Azure via POST*/}
     var req = Request.post('/delete');
-    req.set('userID', this.state.userID)
-       .send({filename: this.state.acceptedFilesData[fileIndex].name})
+    req.set('UserID', this.state.userID)
+       .set('Content-Type', 'application/json')
+       .send({'filename': this.state.acceptedFilesData[fileIndex].name})
        .end((err, res) => {console.log(res.statusText);});
 
     var newAcceptedFilesData = 

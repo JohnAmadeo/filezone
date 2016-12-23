@@ -17,7 +17,6 @@ BLOCK_BLOB_SERVICE = BlockBlobService(
 
 @app.route('/')
 def serve_index():
-    # return render_template('gdrive.html')
     return render_template('index.html')    
 
 
@@ -26,12 +25,13 @@ def upload():
     """
     Uploads files received to Azure inside the folder
 
-    Structure of Request Received:
-    Header: 
-        userid: user ID to which file belongs to 
-    Body:
-        files: PDF files to be uploaded to Azure
+    e.g of incoming JSON object 
 
+    POST https://filezone.herokuapp.com/upload
+    Content-Disposition: attachment
+    UserID: dfe31a9d-bf44-463f-8991-c2edffe349f0
+
+    --- (content of attached files goes here) ---
     """
     user_id = request.headers['userid']
     pdf_dictionary = request.files
@@ -43,7 +43,9 @@ def upload():
                            filename=filename, 
                            user_id=user_id)
 
-    return make_response()
+    return Response(response={}, 
+                    status=200, 
+                    mimetype='application/json')
 
 def store_PDF_in_azure(local_path_to_file, filename, user_id):
     """
@@ -62,24 +64,30 @@ def store_PDF_in_azure(local_path_to_file, filename, user_id):
     )
     print('Successfully uploaded ' + filename)
 
-
-
 @app.route('/delete', methods=['POST'])
 def delete():
     """
     Deletes a file from Azure
 
-    Structure of Request Received:
-    Headers:
-        userid: user ID to which file belongs to
-    Body:
-        filename: name of file to be deleted
+    e.g of incoming JSON object 
+
+    POST https://filezone.herokuapp.com/delete
+    Content-Type: application/json
+    UserID: dfe31a9d-bf44-463f-8991-c2edffe349f0
+
+    {
+        'filename': 'filezone.pdf'
+    }
+
+    filename: name of file to be deletedå
     """
     filename = json.loads(request.data.decode('utf-8'))['filename']
     user_id = request.headers['userid']
     remove_PDF_from_azure(filename, user_id)
 
-    return make_response()
+    return Response(response={}, 
+                    status=200, 
+                    mimetype='application/json')
 
 def remove_PDF_from_azure(filename, user_id):
     """
@@ -96,7 +104,6 @@ def remove_PDF_from_azure(filename, user_id):
     print('Successfully deleted ' + filename)
 
 
-
 @app.route('/rename_duplicates', methods=['POST'])
 def rename_duplicates():
     """
@@ -109,16 +116,45 @@ def rename_duplicates():
     unique filename. Returns a single array of unique filenames 
     for both files already in and to be uploaded to Azure.
 
-    Structure of Request Received:
-    Body:
-        filesData: an array of filenames already in the user's 
-        Azure folder
-        newFilesData: an array of filenames that the user
-        wants to add to his/her folder
+    e.g of incoming JSON object 
 
-    Structure of Response Returned
-    Body: A single array of unique filenames for all files - including
-    files already in Azure and files to be uploaded
+    POST https://filezone.herokuapp.com/rename_duplicates
+    Content-Type: application/json
+
+    {
+        'filesData':  [
+                         {
+                             'name': 'filezone.pdf',
+                             'size': '0.05'
+                         }
+                      ],
+        'newFilesData': [   
+                            {
+                                'name': 'filezone2.pdf',
+                                'size': '1.34' 
+                            }
+                        ]
+    }    
+
+    filesData: an array of filenames already in the user's 
+    Azure folder
+
+    newFilesData: an array of filenames that the user
+    wants to add to his/her folder
+
+    e.g of response JSON object
+
+    {
+        'filesData':  [
+                         {
+                             'name': 'filezone3.pdf',
+                             'size': '0.49'
+                         }
+                      ]
+    }    
+
+    filesData: A single array of unique filenames for all 
+    files - including files already in Azure and files to be uploaded
     """
     file_data_list = (request.get_json())['filesData']
     new_file_data_list = (request.get_json())['newFilesData']
@@ -131,7 +167,7 @@ def rename_duplicates():
         }
         file_data_list.append(renamed_file_data)
 
-    return Response(response=json.dumps(file_data_list), 
+    return Response(response=json.dumps({'filesData': file_data_list}), 
                     status=200, 
                     mimetype='application/json')
 
@@ -169,9 +205,21 @@ def download_from_dropbox_and_store():
     temporarily and uploads them to Azure with names speicfied
     in the filenames list
 
-    Structure of Request Received:
+    e.g of incoming JSON object 
+
+    POST https://filezone.herokuapp.com/download_from_dropbox_and_store
+    Content-Type: application/json
+
+    {
+        'fileUrlList':  ['dl.dropboxcontent.com/s/vu5dz/filezone.pdf',
+                         'dl.dropboxcontent.com/s/vu5dz/filezone2.pdf'],
+        'newFilesData': ['filezone.pdf', 'filezone2.pdf']
+    }   
+    'dl.dropboxcontent.com/s/vuziu2wsa6mp5dz/filezone.pdf'
+
     fileUrlList: array of URLs to PDFs stored on a Dropbox account
     that are to be downloaded
+    
     filenameList: array of names that the files downloaded off
     Dropbox should be saved as on Azure (file name provided may
     not be equivalent to current name on Dropbox due to collisions)
@@ -206,13 +254,11 @@ def download_file(url):
     saves file onto temporary folder on local/Heroku filesystem
     """
     local_file_path = '/tmp/' + url.split('/')[-1]
-    # NOTE the stream=True parameter
     r = requests.get(url, stream=True)
     with open(local_file_path, 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024): 
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
-                #f.flush() commented by recommendation from J.F.Sebastian
     return local_file_path
 
 if __name__ == '__main__':
