@@ -11,7 +11,8 @@ body {
   /*border: 1px solid black;*/
   background-color: #4CCEAD;
   border-bottom: 2px solid #32B594;
-  /*text-transform: uppercase;*/
+  text-transform: uppercase;
+  font-weight: lighter;
 }
 
 #app .Header .navbar-brand {
