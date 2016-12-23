@@ -21823,28 +21823,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var Main = function (_React$Component) {
-	  _inherits(Main, _React$Component);
-
-	  function Main(props) {
-	    _classCallCheck(this, Main);
-
-	    return _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this, props));
-	  }
-
-	  _createClass(Main, [{
-	    key: 'render',
-	    value: function render() {
-	      return _react2.default.createElement(
-	        'div',
-	        { className: 'Main container' },
-	        _react2.default.createElement(Branding, null)
-	      );
-	    }
-	  }]);
-
-	  return Main;
-	}(_react2.default.Component);
+	var Main = function Main(props) {
+	  return _react2.default.createElement(
+	    'div',
+	    { className: 'Main container' },
+	    _react2.default.createElement(Branding, null),
+	    _react2.default.createElement(LoginBox, null)
+	  );
+	};
 
 	var Branding = function Branding(props) {
 	  return _react2.default.createElement(
@@ -21863,6 +21849,38 @@
 	    )
 	  );
 	};
+
+	var LoginBox = function (_React$Component) {
+	  _inherits(LoginBox, _React$Component);
+
+	  function LoginBox(props) {
+	    _classCallCheck(this, LoginBox);
+
+	    return _possibleConstructorReturn(this, (LoginBox.__proto__ || Object.getPrototypeOf(LoginBox)).call(this, props));
+	  }
+
+	  _createClass(LoginBox, [{
+	    key: 'render',
+	    value: function render() {
+	      return _react2.default.createElement(
+	        'div',
+	        { className: 'LoginBox' },
+	        _react2.default.createElement(
+	          'button',
+	          { type: 'button', className: 'btn btn-default fb' },
+	          'Log in with Facebook'
+	        ),
+	        _react2.default.createElement(
+	          'button',
+	          { type: 'button', className: 'btn btn-default guest' },
+	          'Use as Guest (PDFs not stored)'
+	        )
+	      );
+	    }
+	  }]);
+
+	  return LoginBox;
+	}(_react2.default.Component);
 
 	module.exports = Main;
 

@@ -1,5 +1,5 @@
 body {
-  padding-top: 175px;
+  padding-top: 200px;
   background-color: #4CCEAD;
 }
 
@@ -10,7 +10,7 @@ body {
 /* Main */
 @media (min-width: 0px) {
   #app .Main {
-    max-width: 320px;
+    max-width: 400px;
   }
 }
 
@@ -37,27 +37,57 @@ body {
   text-align: center;
 }
 
-@media (min-width: 0px) {
-  #app .Branding span {
-    font-size: 48px;
-  }
-
-  #app .Branding img {
-    width: 40px;
-    margin-top: -30px;
-    margin-right: 10px;
-  }
+#app .Branding span {
+  font-size: 64px;
 }
 
-@media (min-width: 480px) {
-  #app .Branding span {
-    font-size: 64px;
-  }
-
-  #app .Branding img {
-    width: 50px;
-    margin-top: -40px;
-    margin-right: 20px;
-  }
+#app .Branding img {
+  width: 45px;
+  margin-top: -40px;
+  margin-right: 10px;
 }
+
+/* LoginBox */ 
+
+#app .LoginBox {
+  display: table;
+  margin: 0 auto;
+}
+
+#app .LoginBox .btn{
+  display: block;
+  width: 300px;
+  padding: 15px;
+  margin: 15px;
+  border: 0px;
+  font-weight: bold;
+}
+
+#app .LoginBox .fb {
+  color: #3B5998;
+  background-color: #FFFFFF;
+}
+
+#app .LoginBox .fb:hover {
+  color: #FFFFFF;
+  background-color: #3B5998;
+  border: 2px solid #FFFFFF;
+  /*margin-bottom: -4px;*/
+  padding: 13px;
+}
+
+#app .LoginBox .guest {
+  color: #4CCEAD;
+  background-color: #FFFFFF;
+}
+
+#app .LoginBox .guest:hover {
+  color: #FFFFFF;
+  background-color: #4CCEAD;
+  border: 2px solid #FFFFFF;
+  padding: 13px;
+}
+
+
+
 
