@@ -88,19 +88,14 @@ class Storage extends React.Component {
       }
     }
 
-    console.log(rejectedFilesData);
-
     this.setState({
       rejectedFilesData: rejectedFilesData,
       isUploading: acceptedFiles.length === 0 ? false : true
     })
 
-
-    if(acceptedFiles) {
+    if(acceptedFiles.length > 0) {
       this.renameDuplicateFiles(acceptedFiles);
     }
-
-    console.log(acceptedFiles);
   }
   onDrop(acceptedFiles, rejectedFiles) {  
     {/* Trigerred following drag-n-drop of files into the dropzone */}
@@ -116,7 +111,9 @@ class Storage extends React.Component {
 
     {/* Update acceptedFilesData so user can be given ability
         to view and open newly uploaded files in <FileList /> */}
-    this.renameDuplicateFiles(acceptedFiles);
+    if(acceptedFiles.length > 0) {
+      this.renameDuplicateFiles(acceptedFiles);      
+    }
   }
   onLoadChooser() {
     {/* Create Dropbox Chooser to allow upload of files in a 
@@ -219,7 +216,7 @@ class Storage extends React.Component {
         <UploadBox onDrop={this.onDrop} userID={this.state.userID}
                    onLoadChooser={this.onLoadChooser}
                    onLoadLocal={this.onLoadLocal}/>
-        <LoadingAlert isUploading={this.state.isUploading}/>
+        <SuccessUploadAlert isUploading={this.state.isUploading}/>
         <FileList acceptedFilesData={this.state.acceptedFilesData} 
                   userID={this.state.userID} 
                   onDelete={this.onDelete}/>
@@ -234,14 +231,14 @@ Storage.propTypes = {
   userID: React.PropTypes.string
 }
 
-class LoadingAlert extends React.Component {
+class SuccessUploadAlert extends React.Component {
   constructor(props) {
     super(props);
   }
   render() {
     if(this.props.isUploading === true) {
       return (
-        <div className="LoadingAlert"> 
+        <div className="SuccessUploadAlert"> 
           Uploading files... 
         </div>
       )      
@@ -265,7 +262,7 @@ class FailedUploadAlert extends React.Component {
     var rejectedFilenames = rejectedFilesData.map((fileData) => fileData.name);
     if(rejectedFilesData && rejectedFilesData.length > 0) {
       return (
-        <div className="alert alert-danger alert-dismissible" role="alert">
+        <div className="FailedUploadAlert alert alert-danger alert-dismissible" role="alert">
           <button type="button" className="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>

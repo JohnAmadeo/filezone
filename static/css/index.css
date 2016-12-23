@@ -97,9 +97,9 @@ body {
   color: #3366CC;
 }
 
-/* LoadingAlert */
+/* SuccessUploadAlert */
 
-#app .LoadingAlert {
+#app .SuccessUploadAlert {
   margin-top: 20px;
   background-color: #3366CC;
   padding: 15px;
@@ -107,6 +107,16 @@ body {
   color: #FFFFFF;
   /*font-weight: bold;*/
 } 
+
+#app .FailedUploadAlert {
+  border: 0px;
+  background-color: #FF5B5B;
+  color: #FFFFFF;
+}
+
+#app .FailedUploadAlert .close span {
+  color: #FFFFFF;
+}
 
 /* FileList */
 #app .FileList {
@@ -149,7 +159,7 @@ body {
 
 #app .FileList .delete-cross a {
   cursor: pointer;
-  color: red;
+  color: #FF5B5B;
 }
 
 #app .FileList th:nth-child(1) {
