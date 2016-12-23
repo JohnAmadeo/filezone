@@ -1,11 +1,12 @@
 var webpack = require('webpack');  
 module.exports = {  
-  entry: [
-    "./static/js/app.js"
-  ],
+  entry: {
+    "app": "./static/js/app.js",
+    "login": "./static/js/login.js"
+  },
   output: {
-    path: __dirname + '/static',
-    filename: "bundle.js"
+    path: __dirname + '/static/dist',
+    filename: "[name].js"
   },
   module: {
     loaders: [

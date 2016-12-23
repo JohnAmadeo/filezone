@@ -1,0 +1,63 @@
+body {
+  padding-top: 175px;
+  background-color: #4CCEAD;
+}
+
+#app {
+  font-family: 'Source Sans Pro', 'Helvetica';
+}
+
+/* Main */
+@media (min-width: 0px) {
+  #app .Main {
+    max-width: 320px;
+  }
+}
+
+@media (min-width: 480px) {
+  #app .Main {
+    max-width: 480px;
+  }
+}
+
+/* Branding */
+#app .Branding {
+  margin: 0 auto;
+  color: #FFFFFF;
+  display: table;
+}
+
+#app .Branding span {
+  font-weight: lighter;
+  text-transform: uppercase;
+}
+
+#app .Branding p {
+  font-size: 15px;
+  text-align: center;
+}
+
+@media (min-width: 0px) {
+  #app .Branding span {
+    font-size: 48px;
+  }
+
+  #app .Branding img {
+    width: 40px;
+    margin-top: -30px;
+    margin-right: 10px;
+  }
+}
+
+@media (min-width: 480px) {
+  #app .Branding span {
+    font-size: 64px;
+  }
+
+  #app .Branding img {
+    width: 50px;
+    margin-top: -40px;
+    margin-right: 20px;
+  }
+}
+

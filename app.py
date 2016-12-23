@@ -17,8 +17,12 @@ BLOCK_BLOB_SERVICE = BlockBlobService(
 
 @app.route('/')
 def serve_index():
-    return render_template('index.html')    
+    # return render_template('fblogin.html')
+    return render_template('app.html')  
 
+@app.route('/login')
+def serve_login():
+    return render_template('login.html')  
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -219,7 +223,7 @@ def download_from_dropbox_and_store():
 
     fileUrlList: array of URLs to PDFs stored on a Dropbox account
     that are to be downloaded
-    
+
     filenameList: array of names that the files downloaded off
     Dropbox should be saved as on Azure (file name provided may
     not be equivalent to current name on Dropbox due to collisions)
