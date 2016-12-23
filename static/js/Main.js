@@ -43,6 +43,7 @@ class Storage extends React.Component {
     this.onDelete = this.onDelete.bind(this);
     this.onLoadChooser = this.onLoadChooser.bind(this);
     this.onLoadLocal = this.onLoadLocal.bind(this);
+    this.onCloseFailedUploadAlert = this.onCloseFailedUploadAlert.bind(this);
 
     this.showAlertAndRenameFiles = this.showAlertAndRenameFiles.bind(this);
     this.renameDuplicateFiles = this.renameDuplicateFiles.bind(this);
@@ -213,10 +214,17 @@ class Storage extends React.Component {
     });
     Store.session.set('acceptedFilesData', newAcceptedFilesData);
   }
+  onCloseFailedUploadAlert() {
+    this.setState({
+      rejectedFilesData: []
+    })
+  }
   render() {
     return (
       <div className="Storage container">
-        <FailedUploadAlert rejectedFilesData={this.state.rejectedFilesData}/>
+        <FailedUploadAlert 
+            rejectedFilesData={this.state.rejectedFilesData}
+            onCloseAlert={this.onCloseFailedUploadAlert}/>
         <UploadBox onDrop={this.onDrop} userID={this.state.userID}
                    onLoadChooser={this.onLoadChooser}
                    onLoadLocal={this.onLoadLocal}/>
@@ -232,7 +240,8 @@ class Storage extends React.Component {
 Storage.propTypes = {
   acceptedFilesData: React.PropTypes.arrayOf(React.PropTypes.object),
   rejectedFilesData: React.PropTypes.arrayOf(React.PropTypes.object),
-  userID: React.PropTypes.string
+  userID: React.PropTypes.string,
+  isUploading: React.PropTypes.bool
 }
 
 class SuccessUploadAlert extends React.Component {
@@ -266,9 +275,9 @@ class FailedUploadAlert extends React.Component {
     var rejectedFilenames = rejectedFilesData.map((fileData) => fileData.name);
     if(rejectedFilesData && rejectedFilesData.length > 0) {
       return (
-        <div className="FailedUploadAlert alert alert-danger alert-dismissible" role="alert">
-          <button type="button" className="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+        <div className="FailedUploadAlert">
+          <button  type="button" className="close">
+            <span onClick={this.props.onCloseAlert} aria-hidden="true">&times;</span>
           </button>
           Sorry! <strong> {rejectedFilenames.join(', ')} </strong> 
           {rejectedFilenames.length > 1 ? "were " : "was "} 
