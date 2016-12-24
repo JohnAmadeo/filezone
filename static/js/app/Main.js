@@ -14,7 +14,7 @@ class Main extends React.Component {
     return (
       <div className='Main'>
         <Header />
-        <Storage />
+        <Storage /> 
       </div>
     )
   }
@@ -62,17 +62,32 @@ class Storage extends React.Component {
   getLocalPersistentState() {
     {/* Retrieve state values from previous sessions stored
         on localStorage using store.js library */}
-    var acceptedFilesData = Store.session.get('acceptedFilesData') ? 
-                            Store.session.get('acceptedFilesData') : [];
 
-    var userID = Store.session.get('userID') ? 
-                 Store.session.get('userID') : UUID();
-    Store.session.set('userID', userID);
+    var localPersistentState;
+    var guessUserID = Store.session.get('userID');
+    var guessAcceptedFilesData = Store.session.get('acceptedFilesData');
+
+    if(!guessAcceptedFilesData && guessUserID) {
+      var req = Request.post('/get_user_filenames');
+      req.set('Content-Type', 'application/json')
+         .set('UserID', guessUserID)
+         .end((err, res) => {
+            this.setState({
+              acceptedFilesData: res.body.filesData
+            })  
+         });  
+    }
+    else {
+      guessUserID = UUID();
+    }
+
+    Store.session.set('userID', guessUserID);
 
     return {
-      'acceptedFilesData': acceptedFilesData,
-      'userID': userID
-    }
+      'acceptedFilesData': guessAcceptedFilesData ? 
+                           guessAcceptedFilesData : [],
+      'userID': guessUserID 
+    };
   }
   onLoadLocal(e) {
     {/* Load files from local folders after the 'Computer' button 

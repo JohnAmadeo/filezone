@@ -31,22 +31,25 @@ class LoginBox extends React.Component {
     this.onGuestLogin = this.onGuestLogin.bind(this);
   }
   onFBLogin() {
-    {/*FB.login(function(response) {
+    Store.session.remove('userID');
+    Store.session.remove('acceptedFilesData');
+    FB.login(function(response) {
       if(response.authResponse) {
         console.log("Yay! Login was successful");
         FB.api('/me', function(response) {
-          console.log('User info below:');
-          console.log(response);
+          Store.session.set('userID', response.id);
+          window.location.href="/app";   
         }); 
       }
       else {
         console.log('User cancelled login or did not fully authorize.');
       }
-    });*/}
-    window.location.href="http://www.theverge.com/";
+    });
   }
   onGuestLogin() {
-
+    Store.session.remove('userID');
+    Store.session.remove('acceptedFilesData');
+    window.location.href="/app";
   }
   render() {
     return (
@@ -55,7 +58,8 @@ class LoginBox extends React.Component {
           onClick={this.onFBLogin}>
           Log in with Facebook
         </button>
-        <button type="button" className="btn btn-default guest">
+        <button type="button" className="btn btn-default guest"
+          onClick={this.onGuestLogin}>
           Use as Guest (PDFs not stored)
         </button>   
       </div>

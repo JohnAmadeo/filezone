@@ -18,7 +18,6 @@ BLOCK_BLOB_SERVICE = BlockBlobService(
 @app.route('/')
 def serve_index():
     return render_template('login.html')
-    # return render_template('app.html')  
 
 @app.route('/app')
 def serve_login():
@@ -200,8 +199,6 @@ def get_unique_name(filename, filename_list):
 
     return filename
 
-
-
 @app.route('/download_from_dropbox_and_store', methods=['POST'])
 def download_from_dropbox_and_store():
     """
@@ -213,6 +210,7 @@ def download_from_dropbox_and_store():
 
     POST https://filezone.herokuapp.com/download_from_dropbox_and_store
     Content-Type: application/json
+    UserID: dfe31a9d-bf44-463f-8991-c2edffe349f0
 
     {
         'fileUrlList':  ['dl.dropboxcontent.com/s/vu5dz/filezone.pdf',
@@ -264,6 +262,47 @@ def download_file(url):
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
     return local_file_path
+
+@app.route('/get_user_filenames', methods=['POST'])
+def get_user_filenames():
+    """
+    Return a list of names for all files currently stored 
+    in the user's account
+
+    e.g of incoming JSON object 
+
+    POST https://filezone.herokuapp.com/get_user_filenames
+    Content-Type: application/json
+    UserID: dfe31a9d-bf44-463f-8991-c2edffe349f0
+
+    { /* empty */ }
+
+    e.g of response JSON object 
+
+    {
+        'filesData':  [
+                         {
+                             'name': 'filezone3.pdf',
+                             'size': '0.49'
+                         }
+                      ]
+    }    
+
+    """
+    user_path = 'pdf/' + request.headers['userid']
+    blob_list = BLOCK_BLOB_SERVICE.list_blobs('filezone-static',
+                                              prefix=user_path)
+
+    files_data_list = []
+    for blob in blob_list:
+        filename = (blob.name.split(user_path + '/'))[1]
+        size = round(blob.properties.content_length / 1000000, 2)
+
+        files_data_list.append({'name': filename, 'size': size})
+
+    return Response(response=json.dumps({'filesData': files_data_list}), 
+                    status=200, 
+                    mimetype='application/json')
 
 if __name__ == '__main__':
     # app.run(debug=True)
