@@ -26,11 +26,33 @@ const Branding = (props) => {
 class LoginBox extends React.Component {
   constructor(props) {
     super(props);
+  
+    this.onFBLogin = this.onFBLogin.bind(this);
+    this.onGuestLogin = this.onGuestLogin.bind(this);
+  }
+  onFBLogin() {
+    {/*FB.login(function(response) {
+      if(response.authResponse) {
+        console.log("Yay! Login was successful");
+        FB.api('/me', function(response) {
+          console.log('User info below:');
+          console.log(response);
+        }); 
+      }
+      else {
+        console.log('User cancelled login or did not fully authorize.');
+      }
+    });*/}
+    window.location.href="http://www.theverge.com/";
+  }
+  onGuestLogin() {
+
   }
   render() {
     return (
       <div className="LoginBox">
-        <button type="button" className="btn btn-default fb">
+        <button type="button" className="btn btn-default fb"
+          onClick={this.onFBLogin}>
           Log in with Facebook
         </button>
         <button type="button" className="btn btn-default guest">

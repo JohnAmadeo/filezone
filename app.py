@@ -17,12 +17,12 @@ BLOCK_BLOB_SERVICE = BlockBlobService(
 
 @app.route('/')
 def serve_index():
-    # return render_template('fblogin.html')
-    return render_template('app.html')  
+    return render_template('login.html')
+    # return render_template('app.html')  
 
-@app.route('/login')
+@app.route('/app')
 def serve_login():
-    return render_template('login.html')  
+    return render_template('app.html')  
 
 @app.route('/upload', methods=['POST'])
 def upload():
