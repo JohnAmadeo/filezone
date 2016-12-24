@@ -26,13 +26,15 @@ const Branding = (props) => {
 class LoginBox extends React.Component {
   constructor(props) {
     super(props);
+
+    {/* Wipe old session data */}
+    Store.session.remove('userID');
+    Store.session.remove('acceptedFilesData');
   
     this.onFBLogin = this.onFBLogin.bind(this);
     this.onGuestLogin = this.onGuestLogin.bind(this);
   }
   onFBLogin() {
-    Store.session.remove('userID');
-    Store.session.remove('acceptedFilesData');
     FB.login(function(response) {
       if(response.authResponse) {
         console.log("Yay! Login was successful");
@@ -47,8 +49,6 @@ class LoginBox extends React.Component {
     });
   }
   onGuestLogin() {
-    Store.session.remove('userID');
-    Store.session.remove('acceptedFilesData');
     window.location.href="/app";
   }
   render() {
