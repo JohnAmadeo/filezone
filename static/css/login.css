@@ -10,13 +10,13 @@ body {
 /* Main */
 @media (min-width: 0px) {
   #app .Main {
-    max-width: 400px;
+    width: 360px;
   }
 }
 
 @media (min-width: 480px) {
   #app .Main {
-    max-width: 480px;
+    width: 480px;
   }
 }
 
@@ -37,14 +37,30 @@ body {
   text-align: center;
 }
 
-#app .Branding span {
-  font-size: 64px;
+@media (min-width: 0px) {
+  #app .Branding span {
+    font-size: 48px;
+  }
+
+  #app .Branding img {
+    width: 40px;
+    margin-top: -30px;
+    margin-right: 10px;
+    margin-left: 25px; 
+  }
 }
 
-#app .Branding img {
-  width: 45px;
-  margin-top: -40px;
-  margin-right: 10px;
+@media (min-width: 480px) {
+  #app .Branding span {
+    font-size: 64px;
+  }
+
+  #app .Branding img {
+    width: 45px;
+    margin-top: -40px;
+    margin-right: 10px;
+    margin-left: -5px;
+  }
 }
 
 /* LoginBox */ 
