@@ -20,7 +20,7 @@ def serve_index():
     return render_template('login.html')
 
 @app.route('/app')
-def serve_login():
+def serve_app():
     return render_template('app.html')  
 
 @app.route('/upload', methods=['POST'])
